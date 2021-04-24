@@ -1,0 +1,13 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "prettier.withNodeModules": true,
+  "editor.tabSize": 2,
+  "[svelte]": {
+    "editor.defaultFormatter": "svelte.svelte-vscode"
+  },
+  "files.exclude": {
+    "node_modules/": true,
+    "src/node_modules": true
+  }
+}
