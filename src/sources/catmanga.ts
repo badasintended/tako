@@ -20,7 +20,7 @@ export namespace catmanga {
       return make<MangaDetail>({
         id: series["series_id"],
         title: series["title"],
-        thumbnail: series["cover_art"]["source"],
+        cover: series["cover_art"]["source"],
         altTitles: series["alt_titles"],
         authors: series["authors"],
         description: series["description"],
@@ -67,7 +67,7 @@ export namespace catmanga {
   }
 
   export namespace indexes {
-    export function latest(pages: number): Promise<MangaPagination> {
+    export function latest(page: number): Promise<MangaPagination> {
       return getNextData(baseUrl).then((it) => {
         return make<MangaPagination>({
           totalPages: 1,
@@ -77,14 +77,14 @@ export namespace catmanga {
             return make<Manga>({
               id: series["series_id"],
               title: series["title"],
-              thumbnail: series["cover_art"]["source"]
+              cover: series["cover_art"]["source"]
             });
           })
         });
       });
     }
 
-    export function all(pages: number): Promise<MangaPagination> {
+    export function all(page: number): Promise<MangaPagination> {
       return getNextData(baseUrl).then((it) => {
         return make<MangaPagination>({
           totalPages: 1,
@@ -93,7 +93,7 @@ export namespace catmanga {
             return make<Manga>({
               id: series["series_id"],
               title: series["title"],
-              thumbnail: series["cover_art"]["source"]
+              cover: series["cover_art"]["source"]
             });
           })
         });

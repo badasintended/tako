@@ -6,11 +6,7 @@ export let manga: MangaDetail;
 
 <div class="flex flex-col sm:flex-row w-full border-b border-gray-200">
   <div class="min-w-60">
-    <img
-      src={manga.thumbnail}
-      alt=""
-      class="w-60 h-80 object-contain mx-auto"
-    />
+    <img src={manga.cover} alt="" class="w-60 h-80 object-contain mx-auto" />
   </div>
   <div class="flex-grow flex flex-col py-2 space-y-1">
     <div class="flex flex-col px-2 py-1">

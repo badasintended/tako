@@ -24,12 +24,13 @@ export class MangaPagination {
 export class Manga {
   id: string;
   title: string;
-  thumbnail?: string;
+  cover: string;
 }
 
 export class MangaDetail extends Manga {
   altTitles?: string[];
   authors?: string[];
+  artists?: string[];
   status?: PublicationStatus;
   genres?: string[];
   description?: string;

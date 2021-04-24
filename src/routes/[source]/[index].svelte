@@ -52,7 +52,7 @@ function more() {
     {#each mangas as manga}
       <button
         class="m-1 w-40 h-60 bg-contain bg-no-repeat bg-center"
-        style="background-image: url({manga.thumbnail})"
+        style="background-image: url({manga.cover})"
         on:click={() => goto(`/${source}/series/${manga.id}`)}
         ><button
           class="p-2 w-40 h-60 bg-gray-300 opacity-0 transition-opacity duration-300 ease-in-out hover:opacity-100"

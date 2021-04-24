@@ -15,7 +15,7 @@ export namespace test {
       id: mangaId,
       title: "Test manga",
       altTitles: ["bruh moment"],
-      thumbnail: "https://picsum.photos/200/300",
+      cover: "https://picsum.photos/200/300",
       authors: ["deirn", "also deirn"],
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
@@ -77,12 +77,12 @@ export namespace test {
           {
             id: "0",
             title: "Test manga 0",
-            thumbnail: "https://picsum.photos/200/300"
+            cover: "https://picsum.photos/200/300"
           },
           {
             id: "1",
             title: "Test manga 1",
-            thumbnail: "https://picsum.photos/200/300"
+            cover: "https://picsum.photos/200/300"
           }
         ]
       };

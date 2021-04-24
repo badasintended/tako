@@ -48,3 +48,10 @@ export function getHtml(
 export function getNextData(url: string): Promise<any> {
   return getHtml(url, "#__NEXT_DATA__").then((it) => JSON.parse(it.html()));
 }
+
+/**
+ * Get JSON from API
+ */
+export function getJson(url: string): Promise<any> {
+  return getText(url).then(JSON.parse);
+}
