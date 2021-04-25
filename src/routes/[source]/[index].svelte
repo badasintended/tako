@@ -17,10 +17,9 @@ export const load: Load = async ({ page, fetch }) => {
 </script>
 
 <script lang="ts">
-import type { MangaPagination, Manga } from "tako/api/model";
-import { goto } from "$app/navigation";
+import type { MangaPagination, Manga } from "api/model";
 import { onMount } from "svelte";
-import NavBar from "tako/client/NavBar.svelte";
+import NavBar from "client/component/NavBar.svelte";
 
 export let source: string;
 export let index: string;
@@ -47,19 +46,26 @@ function more() {
 
 <NavBar {source} />
 
-<div class="mt-14 pt-2 mb-4">
+<div class="pt-2 mb-4">
+  {#if mangas.length === 0}
+    <img
+      class="w-72 m-auto"
+      src="https://i.kym-cdn.com/photos/images/newsfeed/001/864/893/0d5.png"
+      alt="there's nothing here"
+    />
+  {/if}
   <div class="flex flex-wrap flex-row justify-center">
     {#each mangas as manga}
-      <button
-        class="m-1 w-40 h-60 bg-contain bg-no-repeat bg-center"
-        style="background-image: url({manga.cover})"
-        on:click={() => goto(`/${source}/series/${manga.id}`)}
-        ><button
-          class="p-2 w-40 h-60 bg-gray-300 opacity-0 transition-opacity duration-300 ease-in-out hover:opacity-100"
-        >
+      <a class="flex flex-col w-40 h-72 m-2 group" href="/{source}/series/{manga.id}">
+        <img
+          class="w-40 h-60 object-cover rounded-md transition-shadow duration-300 ease-in-out group-hover:shadow-2xl"
+          src={manga.cover}
+          alt={manga.title}
+        />
+        <div class="text-sm line-clamp-2 overflow-ellipsis">
           {manga.title}
-        </button></button
-      >
+        </div>
+      </a>
     {/each}
   </div>
   {#if pagination.page < pagination.totalPages}

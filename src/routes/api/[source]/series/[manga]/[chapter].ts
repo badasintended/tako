@@ -1,6 +1,8 @@
+import * as sources from "sources";
+
 import type { Request, Response } from "@sveltejs/kit";
-import type { Source } from "tako/api/source";
-import * as sources from "tako/sources";
+
+import type { Source } from "api/model";
 
 export async function get(req: Request): Promise<Response> {
   const { source, manga, chapter } = req.params;

@@ -23,10 +23,10 @@ export const load: Load = async ({ page, fetch }) => {
 </script>
 
 <script lang="ts">
-import type { MangaDetail, ChapterPagination } from "tako/api/model";
-import Chapters from "tako/client/Chapters.svelte";
-import Detail from "tako/client/Detail.svelte";
-import NavBar from "tako/client/NavBar.svelte";
+import type { MangaDetail, ChapterPagination } from "api/model";
+import Chapters from "client/component/Chapters.svelte";
+import Detail from "client/component/Detail.svelte";
+import NavBar from "client/component/NavBar.svelte";
 
 export let source: string;
 export let manga: MangaDetail;
@@ -35,7 +35,5 @@ export let pagination: ChapterPagination;
 
 <NavBar {source} />
 
-<div class="mt-14">
-  <Detail {manga} />
-  <Chapters {source} {manga} {pagination} />
-</div>
+<Detail {source} {manga} />
+<Chapters {source} {manga} {pagination} />

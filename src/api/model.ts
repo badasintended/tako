@@ -15,46 +15,57 @@ export function make<T>(t: T): T {
   return t;
 }
 
-export class MangaPagination {
+export type MangaPagination = {
   totalPages: number;
   page: number;
   mangas: Manga[];
-}
+};
 
-export class Manga {
+export type Manga = {
   id: string;
+  source: string;
   title: string;
   cover: string;
-}
+};
 
-export class MangaDetail extends Manga {
+export type MangaDetail = Manga & {
   altTitles?: string[];
   authors?: string[];
   artists?: string[];
   status?: PublicationStatus;
   genres?: string[];
   description?: string;
-}
+};
 
-export class ChapterPagination {
+export type ChapterPagination = {
   totalPages: number;
   page: number;
   chapters: Chapter[];
-}
+};
 
-export class Chapter {
+export type Chapter = {
   id: string;
+  source: string;
+  manga: string;
   number: number;
-
-  readingMode?: ReadingMode;
-
+  readingMode: ReadingMode;
   volume?: number;
   name?: string;
   uploadDate?: number;
   scanlators?: string[];
-}
+};
 
-export class Page {
+export type Page = {
   url: string;
   index: number;
-}
+};
+
+export type Source = {
+  name: string;
+  baseurl: string;
+  lang: string;
+  indexes: Record<string, (page: number) => Promise<MangaPagination>>;
+  getDetail(mangaId: string): Promise<MangaDetail>;
+  getChapters(mangaId: string, page: number): Promise<ChapterPagination>;
+  getPages(mangaId: string, chapterId: string): Promise<Page[]>;
+};

@@ -9,5 +9,6 @@
   "files.exclude": {
     "node_modules/": true,
     "src/node_modules": true
-  }
+  },
+  "sort-imports.on-save": true
 }

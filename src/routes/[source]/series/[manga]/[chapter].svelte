@@ -19,7 +19,7 @@ export const load: Load = async ({ page, fetch }) => {
 </script>
 
 <script lang="ts">
-import type { Page } from "tako/api/model";
+import type { Page } from "api/model";
 
 export let pages: Page[];
 </script>

@@ -32,10 +32,7 @@ export function getText(url: string): Promise<string> {
 /**
  * Get HTML element from a page
  */
-export function getHtml(
-  url: string,
-  selector?: string
-): Promise<cheerio.Cheerio> {
+export function getHtml(url: string, selector?: string): Promise<cheerio.Cheerio> {
   return getText(url).then((html) => {
     const $ = cheerio.load(html);
     return selector ? $(selector) : $.root();

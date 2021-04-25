@@ -12,7 +12,10 @@ module.exports = {
     vite: {
       resolve: {
         alias: {
-          tako: resolve(__dirname, "src")
+          api: resolve(__dirname, "src/api"),
+          client: resolve(__dirname, "src/client"),
+          routes: resolve(__dirname, "src/routes"),
+          sources: resolve(__dirname, "src/sources")
         }
       }
     }

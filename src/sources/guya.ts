@@ -1,13 +1,15 @@
 import {
-  MangaPagination,
+  Chapter,
+  ChapterPagination,
   Manga,
   MangaDetail,
-  ChapterPagination,
-  Chapter,
+  MangaPagination,
   Page,
+  ReadingMode,
   make
-} from "tako/api/model";
-import { getJson } from "tako/api/fetcher";
+} from "api/model";
+
+import { getJson } from "api/fetcher";
 
 export namespace guya {
   export const name = "Guya.moe";
@@ -18,6 +20,7 @@ export namespace guya {
     return getJson(`${baseUrl}/api/series/${mangaId}`).then((manga) =>
       make<MangaDetail>({
         id: manga["slug"],
+        source: "guya",
         title: manga["title"],
         cover: `${baseUrl}${manga["cover"]}`,
         authors: [manga["author"]],
@@ -27,38 +30,34 @@ export namespace guya {
     );
   }
 
-  export function getChapters(
-    mangaId: string,
-    page: number
-  ): Promise<ChapterPagination> {
+  export function getChapters(mangaId: string, page: number): Promise<ChapterPagination> {
     return getJson(`${baseUrl}/api/series/${mangaId}`).then((manga) => {
-      const groups: string[] = manga["preferred_sort"];
+      const groups: string[] = [
+        ...manga["preferred_sort"],
+        ...Object.keys(manga["groups"])
+      ];
       return make<ChapterPagination>({
         totalPages: 1,
         page: 1,
-        chapters: Object.entries(manga["chapters"])
-          .map(([num, ch]) => {
-            const prevered = Object.keys(ch["groups"]).filter((k) =>
-              groups.includes(k)
-            )[0];
-            return make<Chapter>({
-              id: `${num}-${prevered}`,
-              number: +num,
-              volume: +ch["volume"],
-              name: ch["title"],
-              uploadDate: ch["release_date"][prevered],
-              scanlators: [manga["groups"][prevered]]
-            });
-          })
-          .reverse()
+        chapters: Object.entries(manga["chapters"]).map(([num, ch]) => {
+          const prevered = Object.keys(ch["groups"]).filter((k) => groups.includes(k))[0];
+          return make<Chapter>({
+            id: `${num}-${prevered}`,
+            source: "guya",
+            manga: mangaId,
+            readingMode: ReadingMode.RIGHT_LEFT,
+            number: +num,
+            volume: +ch["volume"],
+            name: ch["title"],
+            uploadDate: ch["release_date"][prevered],
+            scanlators: manga["groups"][prevered].split(" | ")
+          });
+        })
       });
     });
   }
 
-  export function getPages(
-    mangaId: string,
-    chapterId: string
-  ): Promise<Page[]> {
+  export function getPages(mangaId: string, chapterId: string): Promise<Page[]> {
     return getJson(`${baseUrl}/api/series/${mangaId}`).then((manga) => {
       const [number, group] = chapterId.split("-");
       const chapter = manga["chapters"][number];
@@ -80,6 +79,7 @@ export namespace guya {
           mangas: Object.entries(json).map(([title, manga]) =>
             make<Manga>({
               id: manga["slug"],
+              source: "guya",
               title: title,
               cover: `${baseUrl}${manga["cover"]}`
             })

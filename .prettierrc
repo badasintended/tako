@@ -3,5 +3,6 @@
   "semi": true,
   "singleQuote": false,
   "trailingComma": "none",
-  "svelteIndentScriptAndStyle": false
+  "svelteIndentScriptAndStyle": false,
+  "printWidth": 90
 }

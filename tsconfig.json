@@ -24,7 +24,10 @@
     "checkJs": true,
     "paths": {
       "$lib/*": ["src/lib/*"],
-      "tako/*": ["src/*"]
+      "api/*": ["src/api/*"],
+      "client/*": ["src/client/*"],
+      "routes/*": ["src/routes/*"],
+      "sources": ["src/sources"]
     }
   },
   "include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.svelte"]

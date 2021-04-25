@@ -1,13 +1,15 @@
 import {
-  MangaPagination,
+  Chapter,
+  ChapterPagination,
   Manga,
   MangaDetail,
-  ChapterPagination,
-  Chapter,
+  MangaPagination,
   Page,
+  ReadingMode,
   make
-} from "tako/api/model";
-import { getNextData } from "tako/api/fetcher";
+} from "api/model";
+
+import { getNextData } from "api/fetcher";
 
 export namespace catmanga {
   export const name = "CatManga";
@@ -19,6 +21,7 @@ export namespace catmanga {
       const series = it.props.pageProps.series;
       return make<MangaDetail>({
         id: series["series_id"],
+        source: "catmanga",
         title: series["title"],
         cover: series["cover_art"]["source"],
         altTitles: series["alt_titles"],
@@ -29,33 +32,28 @@ export namespace catmanga {
     });
   }
 
-  export function getChapters(
-    mangaId: string,
-    page: number
-  ): Promise<ChapterPagination> {
+  export function getChapters(mangaId: string, page: number): Promise<ChapterPagination> {
     return getNextData(`${baseUrl}/series/${mangaId}`).then((it) => {
       return make<ChapterPagination>({
         totalPages: 1,
         page: 1,
-        chapters: it.props.pageProps.series.chapters
-          .map((it) => {
-            return make<Chapter>({
-              id: it["number"].toString(),
-              volume: it["volume"],
-              number: it["number"],
-              name: it["title"],
-              scanlators: it["groups"]
-            });
-          })
-          .sort((a, b) => b.number - a.number)
+        chapters: it.props.pageProps.series.chapters.map((it) => {
+          return make<Chapter>({
+            id: it["number"].toString(),
+            source: "catmanga",
+            manga: mangaId,
+            readingMode: ReadingMode.RIGHT_LEFT,
+            volume: it["volume"],
+            number: it["number"],
+            name: it["title"],
+            scanlators: it["groups"]
+          });
+        })
       });
     });
   }
 
-  export function getPages(
-    mangaId: string,
-    chapterId: string
-  ): Promise<Page[]> {
+  export function getPages(mangaId: string, chapterId: string): Promise<Page[]> {
     return getNextData(`${baseUrl}/series/${mangaId}/${chapterId}`).then((it) =>
       it.props.pageProps.pages.map((url, i) => {
         return make<Page>({
@@ -76,6 +74,7 @@ export namespace catmanga {
             const series = arr[0];
             return make<Manga>({
               id: series["series_id"],
+              source: "catmanga",
               title: series["title"],
               cover: series["cover_art"]["source"]
             });
@@ -92,6 +91,7 @@ export namespace catmanga {
           mangas: it.props.pageProps.series.map((series) => {
             return make<Manga>({
               id: series["series_id"],
+              source: "catmanga",
               title: series["title"],
               cover: series["cover_art"]["source"]
             });

@@ -1,9 +1,10 @@
-import type {
-  MangaPagination,
-  MangaDetail,
+import {
   ChapterPagination,
-  Page
-} from "tako/api/model";
+  MangaDetail,
+  MangaPagination,
+  Page,
+  ReadingMode
+} from "api/model";
 
 export namespace test {
   export const name = "test";
@@ -13,6 +14,7 @@ export namespace test {
   export function getDetail(mangaId: string): Promise<MangaDetail> {
     const detail: MangaDetail = {
       id: mangaId,
+      source: "test",
       title: "Test manga",
       altTitles: ["bruh moment"],
       cover: "https://picsum.photos/200/300",
@@ -23,26 +25,29 @@ export namespace test {
     return Promise.resolve(detail);
   }
 
-  export function getChapters(
-    mangaId: string,
-    page: number
-  ): Promise<ChapterPagination> {
+  export function getChapters(mangaId: string, page: number): Promise<ChapterPagination> {
     const chapters: ChapterPagination = {
       page: 1,
       totalPages: 1,
       chapters: [
         {
           id: "0",
+          source: "test",
+          manga: mangaId,
           number: 0,
           volume: 1,
           name: "Test",
+          readingMode: ReadingMode.RIGHT_LEFT,
           scanlators: ["deirn"]
         },
         {
           id: "1",
+          source: "test",
+          manga: mangaId,
           number: 1,
           volume: 1,
           name: "Test 1",
+          readingMode: ReadingMode.RIGHT_LEFT,
           scanlators: ["deirn"]
         }
       ]
@@ -51,10 +56,7 @@ export namespace test {
     return Promise.resolve(chapters);
   }
 
-  export function getPages(
-    mangaId: string,
-    chapterId: string
-  ): Promise<Page[]> {
+  export function getPages(mangaId: string, chapterId: string): Promise<Page[]> {
     const pages: Page[] = [
       {
         url: "https://picsum.photos/200/300",
@@ -76,11 +78,13 @@ export namespace test {
         mangas: [
           {
             id: "0",
+            source: "test",
             title: "Test manga 0",
             cover: "https://picsum.photos/200/300"
           },
           {
             id: "1",
+            source: "test",
             title: "Test manga 1",
             cover: "https://picsum.photos/200/300"
           }
