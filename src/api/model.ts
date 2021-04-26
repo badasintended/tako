@@ -37,12 +37,6 @@ export type MangaDetail = Manga & {
   description?: string;
 };
 
-export type ChapterPagination = {
-  totalPages: number;
-  page: number;
-  chapters: Chapter[];
-};
-
 export type Chapter = {
   id: string;
   source: string;
@@ -66,6 +60,6 @@ export type Source = {
   lang: string;
   indexes: Record<string, (page: number) => Promise<MangaPagination>>;
   getDetail(mangaId: string): Promise<MangaDetail>;
-  getChapters(mangaId: string, page: number): Promise<ChapterPagination>;
+  getChapters(mangaId: string): Promise<Chapter[]>;
   getPages(mangaId: string, chapterId: string): Promise<Page[]>;
 };

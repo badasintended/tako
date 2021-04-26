@@ -1,6 +1,5 @@
 import {
   Chapter,
-  ChapterPagination,
   Manga,
   MangaDetail,
   MangaPagination,
@@ -32,25 +31,21 @@ export namespace catmanga {
     });
   }
 
-  export function getChapters(mangaId: string, page: number): Promise<ChapterPagination> {
-    return getNextData(`${baseUrl}/series/${mangaId}`).then((it) => {
-      return make<ChapterPagination>({
-        totalPages: 1,
-        page: 1,
-        chapters: it.props.pageProps.series.chapters.map((it) => {
-          return make<Chapter>({
-            id: it["number"].toString(),
-            source: "catmanga",
-            manga: mangaId,
-            readingMode: ReadingMode.RIGHT_LEFT,
-            volume: it["volume"],
-            number: it["number"],
-            name: it["title"],
-            scanlators: it["groups"]
-          });
-        })
-      });
-    });
+  export function getChapters(mangaId: string): Promise<Chapter[]> {
+    return getNextData(`${baseUrl}/series/${mangaId}`).then((it) =>
+      it.props.pageProps.series.chapters.map((it) => {
+        return make<Chapter>({
+          id: it["number"].toString(),
+          source: "catmanga",
+          manga: mangaId,
+          readingMode: ReadingMode.RIGHT_LEFT,
+          volume: it["volume"],
+          number: it["number"],
+          name: it["title"],
+          scanlators: it["groups"]
+        });
+      })
+    );
   }
 
   export function getPages(mangaId: string, chapterId: string): Promise<Page[]> {

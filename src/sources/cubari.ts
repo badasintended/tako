@@ -1,6 +1,5 @@
 import {
   Chapter,
-  ChapterPagination,
   MangaDetail,
   MangaPagination,
   Page,
@@ -30,26 +29,22 @@ export namespace cubari {
     );
   }
 
-  export function getChapters(mangaId: string, page: number): Promise<ChapterPagination> {
+  export function getChapters(mangaId: string): Promise<Chapter[]> {
     const [type, slug] = mangaId.split("-");
     return getJson(`${baseUrl}/read/api/${type}/series/${slug}`).then((manga) => {
       const groups: string[] = Object.keys(manga["groups"]);
-      return make<ChapterPagination>({
-        totalPages: 1,
-        page: 1,
-        chapters: Object.entries(manga["chapters"]).map(([num, ch]) => {
-          const prevered = Object.keys(ch["groups"]).filter((k) => groups.includes(k))[0];
-          return make<Chapter>({
-            id: `${num}-${prevered}`,
-            source: "cubari",
-            manga: mangaId,
-            readingMode: ReadingMode.RIGHT_LEFT,
-            number: +num,
-            volume: +ch["volume"],
-            name: ch["title"],
-            scanlators: manga["groups"][prevered].split(" | ")
-          });
-        })
+      return Object.entries(manga["chapters"]).map(([num, ch]) => {
+        const prevered = Object.keys(ch["groups"]).filter((k) => groups.includes(k))[0];
+        return make<Chapter>({
+          id: `${num}-${prevered}`,
+          source: "cubari",
+          manga: mangaId,
+          readingMode: ReadingMode.RIGHT_LEFT,
+          number: +num,
+          volume: +ch["volume"],
+          name: ch["title"],
+          scanlators: manga["groups"][prevered].split(" | ")
+        });
       });
     });
   }

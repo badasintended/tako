@@ -1,10 +1,4 @@
-import {
-  ChapterPagination,
-  MangaDetail,
-  MangaPagination,
-  Page,
-  ReadingMode
-} from "api/model";
+import { Chapter, MangaDetail, MangaPagination, Page, ReadingMode } from "api/model";
 
 export namespace test {
   export const name = "test";
@@ -25,33 +19,29 @@ export namespace test {
     return Promise.resolve(detail);
   }
 
-  export function getChapters(mangaId: string, page: number): Promise<ChapterPagination> {
-    const chapters: ChapterPagination = {
-      page: 1,
-      totalPages: 1,
-      chapters: [
-        {
-          id: "0",
-          source: "test",
-          manga: mangaId,
-          number: 0,
-          volume: 1,
-          name: "Test",
-          readingMode: ReadingMode.RIGHT_LEFT,
-          scanlators: ["deirn"]
-        },
-        {
-          id: "1",
-          source: "test",
-          manga: mangaId,
-          number: 1,
-          volume: 1,
-          name: "Test 1",
-          readingMode: ReadingMode.RIGHT_LEFT,
-          scanlators: ["deirn"]
-        }
-      ]
-    };
+  export function getChapters(mangaId: string): Promise<Chapter[]> {
+    const chapters: Chapter[] = [
+      {
+        id: "0",
+        source: "test",
+        manga: mangaId,
+        number: 0,
+        volume: 1,
+        name: "Test",
+        readingMode: ReadingMode.RIGHT_LEFT,
+        scanlators: ["deirn"]
+      },
+      {
+        id: "1",
+        source: "test",
+        manga: mangaId,
+        number: 1,
+        volume: 1,
+        name: "Test 1",
+        readingMode: ReadingMode.RIGHT_LEFT,
+        scanlators: ["deirn"]
+      }
+    ];
 
     return Promise.resolve(chapters);
   }

@@ -1,6 +1,5 @@
 import {
   Chapter,
-  ChapterPagination,
   Manga,
   MangaDetail,
   MangaPagination,
@@ -30,29 +29,25 @@ export namespace guya {
     );
   }
 
-  export function getChapters(mangaId: string, page: number): Promise<ChapterPagination> {
+  export function getChapters(mangaId: string, page: number): Promise<Chapter[]> {
     return getJson(`${baseUrl}/api/series/${mangaId}`).then((manga) => {
       const groups: string[] = [
         ...manga["preferred_sort"],
         ...Object.keys(manga["groups"])
       ];
-      return make<ChapterPagination>({
-        totalPages: 1,
-        page: 1,
-        chapters: Object.entries(manga["chapters"]).map(([num, ch]) => {
-          const prevered = Object.keys(ch["groups"]).filter((k) => groups.includes(k))[0];
-          return make<Chapter>({
-            id: `${num}-${prevered}`,
-            source: "guya",
-            manga: mangaId,
-            readingMode: ReadingMode.RIGHT_LEFT,
-            number: +num,
-            volume: +ch["volume"],
-            name: ch["title"],
-            uploadDate: ch["release_date"][prevered],
-            scanlators: manga["groups"][prevered].split(" | ")
-          });
-        })
+      return Object.entries(manga["chapters"]).map(([num, ch]) => {
+        const prevered = Object.keys(ch["groups"]).filter((k) => groups.includes(k))[0];
+        return make<Chapter>({
+          id: `${num}-${prevered}`,
+          source: "guya",
+          manga: mangaId,
+          readingMode: ReadingMode.RIGHT_LEFT,
+          number: +num,
+          volume: +ch["volume"],
+          name: ch["title"],
+          uploadDate: ch["release_date"][prevered],
+          scanlators: manga["groups"][prevered].split(" | ")
+        });
       });
     });
   }

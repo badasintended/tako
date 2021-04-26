@@ -1,30 +1,38 @@
 import Dexie from "dexie";
 
-export type Library = {
+export type Bookmark = {
+  id?: number;
   source: string;
-  manga: string;
+  mangaId: string;
+  title: string;
+  cover: string;
 };
 
 export type ReadChapter = {
+  id?: number;
   source: string;
   manga: string;
   chapter: string;
 };
 
+export type FakeUploadTime = {
+  id: string;
+  date: number;
+};
+
 export class TakoDatabase extends Dexie {
-  public libraries: Dexie.Table<Library, number>;
+  public libraries: Dexie.Table<Bookmark, number>;
   public readChapters: Dexie.Table<ReadChapter, number>;
-  public fakeUploadTime: Dexie.Table<number, string>;
+  public fakeUploadTimes: Dexie.Table<FakeUploadTime, number>;
 
   public constructor() {
     super("TakoDatabase");
     this.version(1).stores({
-      libraries: "source,manga",
-      readChapters: "source,manga,chapter",
-      fakeUploadTime: "time"
+      libraries: "id++,source,manga",
+      readChapters: "id++,source,manga,chapter",
+      fakeUploadTimes: "id,date"
     });
   }
 }
 
-const db = new TakoDatabase();
-export default db;
+export const db = new TakoDatabase();
