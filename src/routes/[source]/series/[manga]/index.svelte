@@ -126,7 +126,7 @@ function libraryButton() {
         <div class="text-xs font-bold text-gray-500 leading-none">
           Artist{manga.artists.length > 1 ? "s" : ""}
         </div>
-        <div>{manga.authors.join(", ")}</div>
+        <div>{manga.artists.join(", ")}</div>
       </div>
     {/if}
 
