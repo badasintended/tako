@@ -14,8 +14,12 @@ export namespace cubari {
   export const baseUrl = "https://cubari.moe";
   export const lang = "all";
 
+  function split(id: string): string[] {
+    return id.split(/-(.+)/);
+  }
+
   export function getDetail(mangaId: string): Promise<MangaDetail> {
-    const [type, slug] = mangaId.split("-");
+    const [type, slug] = split(mangaId);
     return getJson(`${baseUrl}/read/api/${type}/series/${slug}`).then((manga) =>
       make<MangaDetail>({
         id: mangaId,
@@ -30,7 +34,7 @@ export namespace cubari {
   }
 
   export function getChapters(mangaId: string): Promise<Chapter[]> {
-    const [type, slug] = mangaId.split("-");
+    const [type, slug] = split(mangaId);
     return getJson(`${baseUrl}/read/api/${type}/series/${slug}`).then((manga) => {
       const groups: string[] = Object.keys(manga["groups"]);
       return Object.entries(manga["chapters"]).map(([num, ch]) => {
@@ -50,7 +54,7 @@ export namespace cubari {
   }
 
   export function getPages(mangaId: string, chapterId: string): Promise<Page[]> {
-    const [type, slug] = mangaId.split("-");
+    const [type, slug] = split(mangaId);
     return getJson(`${baseUrl}/read/api/${type}/series/${slug}`).then((manga) => {
       const [number, group] = chapterId.split("-");
       const chapter = manga["chapters"][number];
