@@ -1,4 +1,5 @@
 const preprocess = require("svelte-preprocess");
+const vercel = require("@sveltejs/adapter-vercel");
 const { resolve } = require("path");
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -18,6 +19,7 @@ module.exports = {
           sources: resolve(__dirname, "src/sources")
         }
       }
-    }
+    },
+    adapter: vercel()
   }
 };
