@@ -1,5 +1,5 @@
 name: vercel
-on: 
+on:
   push:
     branches: [master]
 
@@ -11,7 +11,8 @@ jobs:
       - uses: amondnet/vercel-action@v20
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          github-token: ${{ secrets.GITHUB_TOKEN }} 
-          vercel-args: '--prod'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-args: "--prod"
           vercel-org-id: ${{ secrets.VERCEL_ORG }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT }} 
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT }}
+          github-comment: false
