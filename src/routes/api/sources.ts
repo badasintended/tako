@@ -1,7 +1,7 @@
 import * as sources from "sources";
 
-import type { Request, Response } from "@sveltejs/kit";
+import type { EndpointOutput, Request } from "@sveltejs/kit";
 
-export async function get(req: Request<never, never>): Promise<Response> {
-  return { body: sources };
+export async function get(req: Request<never, never>): Promise<EndpointOutput> {
+  return { body: sources as any };
 }
