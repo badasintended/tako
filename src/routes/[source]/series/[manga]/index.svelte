@@ -16,42 +16,46 @@ let libraryId = -1;
 onMount(() => {
   const mangaId = $page.params.manga;
 
-  fetch(`/api/${source}/series/${mangaId}/detail`)
-    .then((res) => res.json())
-    .then((json) => (manga = json));
-
-  fetch(`/api/${source}/series/${mangaId}/chapters`)
-    .then((res) => res.json())
-    .then((json: Chapter[]) => {
-      Promise.all(
-        json.map(async (chapter) => {
-          if (!chapter.uploadDate) {
-            await db.fakeUploadTimes
-              .filter((it) => it.id === chapter.source + chapter.manga + chapter.id)
-              .first((fake) => (chapter.uploadDate = fake.date))
-              .catch(async () => {
-                chapter.uploadDate = Date.now() / 1000;
-                await db.fakeUploadTimes.add({
-                  id: chapter.source + chapter.manga + chapter.id,
-                  date: chapter.uploadDate
-                });
-              });
-          }
-        })
-      ).then(() =>
-        db.readChapters
-          .filter((ch) => ch.source === source && ch.manga === manga.id)
-          .toArray((arr) => {
-            readChapters = arr.map((ch) => ch.chapter);
-            chapters = json.sort((a, b) => b.number - a.number);
-          })
-      );
-    });
-
   db.libraries
-    .filter((lib) => lib.source === source && lib.mangaId === manga.id)
+    .filter((lib) => lib.source === source && lib.mangaId === mangaId)
     .limit(1)
-    .eachPrimaryKey((key) => (libraryId = key));
+    .eachPrimaryKey((key) => (libraryId = key))
+    .then(() =>
+      fetch(`/api/${source}/series/${mangaId}/detail`)
+        .then((res) => res.json())
+        .then((json) => {
+          manga = json;
+          fetch(`/api/${source}/series/${mangaId}/chapters`)
+            .then((res) => res.json())
+            .then((json: Chapter[]) => {
+              Promise.all(
+                json.map(async (chapter) => {
+                  if (!chapter.uploadDate) {
+                    await db.fakeUploadTimes
+                      .filter(
+                        (it) => it.id === chapter.source + chapter.manga + chapter.id
+                      )
+                      .first((fake) => (chapter.uploadDate = fake.date))
+                      .catch(async () => {
+                        chapter.uploadDate = Date.now() / 1000;
+                        await db.fakeUploadTimes.add({
+                          id: chapter.source + chapter.manga + chapter.id,
+                          date: chapter.uploadDate
+                        });
+                      });
+                  }
+                })
+              ).then(() =>
+                db.readChapters
+                  .filter((ch) => ch.source === source && ch.manga === manga.id)
+                  .toArray((arr) => {
+                    readChapters = arr.map((ch) => ch.chapter);
+                    chapters = json.sort((a, b) => b.number - a.number);
+                  })
+              );
+            });
+        })
+    );
 
   $session.manga = manga;
   $session.chapters = chapters;
