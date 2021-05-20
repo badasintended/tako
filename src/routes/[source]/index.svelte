@@ -15,6 +15,7 @@ export const load: Load = async ({ page, fetch }) => {
     };
   }
 };
+
 </script>
 
 <script lang="ts">
@@ -72,6 +73,7 @@ function switchIndex(i: string, replace = true) {
     })
   );
 }
+
 </script>
 
 <NavBar />
