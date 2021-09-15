@@ -1,0 +1,107 @@
+import { getJson } from "tako/api/fetcher";
+import type { Chapter, Manga, Page } from "tako/api/model";
+import { make } from "tako/api/model";
+import type { ParseResult, Source } from "tako/api/source";
+
+const regex = {
+  mcg: /\/read\/manga(?<manga>\/.*?)(?<chapter>\/.*?)(?<group>\/.*?)(\/)?$/i,
+  m: /\/read\/manga(?<manga>\/.*?)(\/)?$/i
+};
+
+export class GuyaSource implements Source {
+  id: string;
+  baseUrl: string;
+
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
+
+  parseUrl(url: URL): Promise<ParseResult> {
+    const path = url.pathname;
+    console.log(path);
+    const mcg = path.match(regex.mcg);
+    console.log(mcg);
+    if (mcg) {
+      return Promise.resolve({
+        sourceId: this.id,
+        mangaId: mcg.groups["manga"].substr(1),
+        chapterId: `${mcg.groups["chapter"].substr(1)}-${mcg.groups["group"].substr(1)}`
+      });
+    }
+
+    const m = path.match(regex.m);
+    if (m) {
+      return Promise.resolve({
+        sourceId: this.id,
+        mangaId: m.groups["manga"].substr(1)
+      });
+    }
+
+    return Promise.reject();
+  }
+
+  getDetails(mangaId: string): Promise<Manga> {
+    return getJson<MangaSpec>(`${(this.baseUrl)}/api/series/${mangaId}`).then(manga => make<Manga>({
+      id: manga.slug,
+      source: this.id,
+      title: manga.title,
+      cover: `${this.baseUrl}${manga.cover}`,
+      authors: [manga.author],
+      artists: [manga.artist],
+      description: manga.description
+    }));
+  }
+
+  getChapters(mangaId: string): Promise<Chapter[]> {
+    return getJson<MangaSpec>(`${this.baseUrl}/api/series/${mangaId}`).then(manga => {
+      const groups: string[] = [
+        ...manga.preferred_sort,
+        ...Object.keys(manga.groups)
+      ];
+      return Object.entries(manga.chapters).map(([num, ch]) => {
+        const prevered = Object.keys(ch.groups).filter((k) => groups.includes(k))[0];
+        return make<Chapter>({
+          id: `${num}-${prevered}`,
+          source: this.id,
+          manga: mangaId,
+          number: +num,
+          volume: +ch.volume,
+          title: ch.title,
+          uploadDate: ch.release_date[prevered],
+          scanlators: manga.groups[prevered].split(" | ")
+        });
+      });
+    });
+  }
+
+  getPages(mangaId: string, chapterId: string): Promise<Page[]> {
+    return getJson<MangaSpec>(`${(this.baseUrl)}/api/series/${mangaId}`).then(manga => {
+      const [number, group] = chapterId.split("-");
+      const chapter = manga.chapters[number];
+      return chapter.groups[group].map((page, i) => make<Page>({
+        index: i,
+        url: `${this.baseUrl}/media/manga/${manga.slug}/chapters/${chapter.folder}/${group}/${page}`
+      }));
+    });
+  }
+}
+
+type MangaSpec = {
+  slug: string
+  title: string
+  description: string
+  author: string
+  artist: string
+  groups: Record<string, string>
+  cover: string
+  preferred_sort: string[]
+  chapters: Record<string, ChapterSpec>
+}
+
+type ChapterSpec = {
+  volume: string
+  title: string
+  folder: string
+  groups: Record<string, string[]>
+  release_date: Record<string, number>
+}
