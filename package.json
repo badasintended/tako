@@ -10,6 +10,7 @@
     "lint": "eslint --ignore-path .gitignore ."
   },
   "devDependencies": {
+    "@sveltejs/adapter-vercel": "next",
     "@sveltejs/kit": "next",
     "@types/cheerio": "^0.22.30",
     "@types/node-fetch": "^2.5.12",
