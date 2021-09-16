@@ -1,28 +1,9 @@
-import fetch from "node-fetch";
+import fetch, { HeadersInit } from "node-fetch";
 import cheerio from "cheerio";
+import Root = cheerio.Root;
 
 let lastCache = 0;
 let cache: Record<string, string> = {};
-
-export function getRaw(url: string): Promise<string> {
-  return getCacheOrDefault(url, url => fetch(url).then(res => res.text()));
-}
-
-export function getJson<T>(url: string): Promise<T> {
-  return getRaw(url).then(JSON.parse);
-}
-
-export function getHtml(url: string, selector?: string): Promise<cheerio.Cheerio> {
-  return getRaw(url).then((html) => {
-    const $ = cheerio.load(html);
-    return selector ? $(selector) : $.root();
-  });
-}
-
-export function getNextData<T>(url: string): Promise<T> {
-  return getHtml(url, "#__NEXT_DATA__")
-    .then(it => JSON.parse(it.html()));
-}
 
 function getCacheOrDefault(
   url: string,
@@ -41,3 +22,31 @@ function getCacheOrDefault(
     return Promise.resolve(cache[url]);
   }
 }
+
+export class Fetcher {
+  private readonly headers: HeadersInit;
+
+  constructor(headers?: HeadersInit) {
+    this.headers = headers;
+  }
+
+  raw(url: string): Promise<string> {
+    return getCacheOrDefault(url, url =>
+      fetch(url, { headers: this.headers })
+        .then(res => res.text()));
+  }
+
+  json<T>(url: string): Promise<T> {
+    return this.raw(url).then(JSON.parse);
+  }
+
+  cheerio(url: string): Promise<Root> {
+    return this.raw(url).then(cheerio.load);
+  }
+
+  next<T>(url: string): Promise<T> {
+    return this.cheerio(url).then($ => JSON.parse($("__NEXT_DATA__").html()));
+  }
+}
+
+export const fetcher = new Fetcher();

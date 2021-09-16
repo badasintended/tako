@@ -1,4 +1,4 @@
-import { getJson } from "tako/api/fetcher";
+import { fetcher } from "tako/api/fetcher";
 import type { Chapter, Manga, Page } from "tako/api/model";
 import { make } from "tako/api/model";
 import type { ParseResult, Source } from "tako/api/source";
@@ -8,7 +8,7 @@ const regex = {
   m: /\/read\/manga(?<manga>\/.*?)(\/)?$/i
 };
 
-export class GuyaSource implements Source {
+export class Guya implements Source {
   id: string;
   baseUrl: string;
 
@@ -41,7 +41,7 @@ export class GuyaSource implements Source {
   }
 
   getDetails(mangaId: string): Promise<Manga> {
-    return getJson<MangaSpec>(`${(this.baseUrl)}/api/series/${mangaId}`).then(manga => make<Manga>({
+    return fetcher.json<MangaSpec>(`${(this.baseUrl)}/api/series/${mangaId}`).then(manga => make<Manga>({
       id: manga.slug,
       source: this.id,
       title: manga.title,
@@ -53,7 +53,7 @@ export class GuyaSource implements Source {
   }
 
   getChapters(mangaId: string): Promise<Chapter[]> {
-    return getJson<MangaSpec>(`${this.baseUrl}/api/series/${mangaId}`).then(manga => {
+    return fetcher.json<MangaSpec>(`${this.baseUrl}/api/series/${mangaId}`).then(manga => {
       const groups: string[] = [
         ...manga.preferred_sort,
         ...Object.keys(manga.groups)
@@ -75,7 +75,7 @@ export class GuyaSource implements Source {
   }
 
   getPages(mangaId: string, chapterId: string): Promise<Page[]> {
-    return getJson<MangaSpec>(`${(this.baseUrl)}/api/series/${mangaId}`).then(manga => {
+    return fetcher.json<MangaSpec>(`${(this.baseUrl)}/api/series/${mangaId}`).then(manga => {
       const [number, group] = chapterId.split("-");
       const chapter = manga.chapters[number];
       return chapter.groups[group].map((page, i) => make<Page>({

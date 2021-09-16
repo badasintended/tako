@@ -33,7 +33,7 @@ export type Chapter = {
   volume?: number
   title?: string
   uploadDate?: number
-  scanlators: string[]
+  scanlators?: string[]
 }
 
 export type Page = {

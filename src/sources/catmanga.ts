@@ -1,11 +1,11 @@
 import type { ParseResult, Source } from "tako/api/source";
 import type { Chapter, Manga, Page } from "tako/api/model";
-import { getNextData } from "tako/api/fetcher";
 import { make } from "tako/api/model";
+import { fetcher } from "tako/api/fetcher";
 
 const regex = /\/series\/(?<manga>.*?)(\/(?<chapter>.*?))\/?$/i;
 
-export class CatMangaSource implements Source {
+export class CatManga implements Source {
   id: string;
   baseUrl = "https://catmanga.org";
 
@@ -23,8 +23,8 @@ export class CatMangaSource implements Source {
   }
 
   getDetails(mangaId: string): Promise<Manga> {
-    return getNextData<MangaSpec>(`${(this.baseUrl)}/series/${mangaId}`).then(it => {
-      console.log(it)
+    return fetcher.next<MangaSpec>(`${(this.baseUrl)}/series/${mangaId}`).then(it => {
+      console.log(it);
       const series = it.props.pageProps.series;
       return make<Manga>({
         id: series.series_id,
@@ -40,7 +40,7 @@ export class CatMangaSource implements Source {
   }
 
   getChapters(mangaId: string): Promise<Chapter[]> {
-    return getNextData<MangaSpec>(`${(this.baseUrl)}/series/${mangaId}`).then((it) =>
+    return fetcher.next<MangaSpec>(`${(this.baseUrl)}/series/${mangaId}`).then((it) =>
       it.props.pageProps.series.chapters.map((it) => {
         return make<Chapter>({
           id: it.number.toString(),
@@ -56,7 +56,7 @@ export class CatMangaSource implements Source {
   }
 
   getPages(mangaId: string, chapterId: string): Promise<Page[]> {
-    return getNextData<ChapterSpec>(`${(this.baseUrl)}/series/${mangaId}/${chapterId}`).then((it) =>
+    return fetcher.next<ChapterSpec>(`${(this.baseUrl)}/series/${mangaId}/${chapterId}`).then((it) =>
       it.props.pageProps.pages.map((url, i) => {
         return make<Page>({
           url: url,

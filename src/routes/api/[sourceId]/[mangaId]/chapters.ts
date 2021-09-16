@@ -1,14 +1,13 @@
 import type { ServerRequest } from "@sveltejs/kit/types/hooks";
 import type { EndpointOutput } from "@sveltejs/kit";
-import type { Source } from "tako/api/source";
 import { sources } from "tako/sources";
 
 export async function get(req: ServerRequest): Promise<EndpointOutput> {
-  const { source, manga } = req.params;
-  const src: Source = sources[source];
-  if (src) {
+  const { sourceId, mangaId } = req.params;
+  const source = sources[sourceId];
+  if (source) {
     return {
-      body: await src.getChapters(manga)
+      body: await source.getChapters(mangaId)
     };
   }
 }
