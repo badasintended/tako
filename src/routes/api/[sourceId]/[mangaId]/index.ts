@@ -1,5 +1,5 @@
-import type { ServerRequest } from "@sveltejs/kit/types/hooks";
 import type { EndpointOutput } from "@sveltejs/kit";
+import type { ServerRequest } from "@sveltejs/kit/types/hooks";
 import { sources } from "tako/sources";
 
 export async function get(req: ServerRequest): Promise<EndpointOutput> {
@@ -7,7 +7,7 @@ export async function get(req: ServerRequest): Promise<EndpointOutput> {
   const source = sources[sourceId];
   if (source) {
     return {
-      body: await source.getChapters(mangaId)
+      body: await source.getManga(mangaId)
     };
   }
 }

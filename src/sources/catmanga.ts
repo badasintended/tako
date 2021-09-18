@@ -1,7 +1,8 @@
 import type { ParseResult, Source } from "tako/api/source";
 import type { Chapter, Manga, Page } from "tako/api/model";
-import { make } from "tako/api/model";
+import { MangaStatus } from "tako/api/model";
 import { fetcher } from "tako/api/fetcher";
+import { make } from "tako/api/util";
 
 const regex = /\/series\/(?<manga>.*?)(\/(?<chapter>.*?))\/?$/i;
 
@@ -22,10 +23,11 @@ export class CatManga implements Source {
     return Promise.reject();
   }
 
-  getDetails(mangaId: string): Promise<Manga> {
+  getManga(mangaId: string): Promise<Manga> {
     return fetcher.next<MangaSpec>(`${(this.baseUrl)}/series/${mangaId}`).then(it => {
       console.log(it);
       const series = it.props.pageProps.series;
+      const status = series.status;
       return make<Manga>({
         id: series.series_id,
         source: this.id,
@@ -34,25 +36,19 @@ export class CatManga implements Source {
         altTitles: series.alt_titles,
         authors: series.authors,
         description: series.description,
-        tags: series.genres
+        tags: series.genres,
+        status: status == "ongoing" ? MangaStatus.ONGOING : status == "completed" ? MangaStatus.COMPLETED : MangaStatus.UNKNOWN,
+        chapters: series.chapters.map((it) => {
+          return make<Chapter>({
+            id: it.number.toString(),
+            volume: it.volume,
+            number: it.number,
+            title: it.title,
+            scanlators: it.groups
+          });
+        })
       });
     });
-  }
-
-  getChapters(mangaId: string): Promise<Chapter[]> {
-    return fetcher.next<MangaSpec>(`${(this.baseUrl)}/series/${mangaId}`).then((it) =>
-      it.props.pageProps.series.chapters.map((it) => {
-        return make<Chapter>({
-          id: it.number.toString(),
-          source: this.id,
-          manga: mangaId,
-          volume: it.volume,
-          number: it.number,
-          title: it.title,
-          scanlators: it.groups
-        });
-      })
-    );
   }
 
   getPages(mangaId: string, chapterId: string): Promise<Page[]> {
@@ -74,6 +70,7 @@ type MangaSpec = {
         series_id: string
         title: string
         alt_titles: string[]
+        status: string
         authors: string[]
         genres: string[]
         description: string

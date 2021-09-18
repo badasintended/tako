@@ -1,34 +1,26 @@
-export enum PublicationStatus {
-  ON_GOING,
-  FINISHED,
-  HIATUS,
-  CANCELLED
+export enum MangaStatus {
+  UNKNOWN,
+  ONGOING,
+  COMPLETED,
+  LICENSED
 }
 
-export function make<T>(t: T): T {
-  return t;
-}
-
-export type MangaCover = {
+export type Manga = {
   id: string
   source: string
   title: string
   cover: string
-}
-
-export type Manga = MangaCover & {
+  status: MangaStatus
+  chapters: Chapter[]
   altTitles?: string[]
   authors?: string[]
   artists?: string[]
-  status?: PublicationStatus
   tags?: string[]
   description?: string
 }
 
 export type Chapter = {
   id: string
-  source: string
-  manga: string
   number: number
   volume?: number
   title?: string

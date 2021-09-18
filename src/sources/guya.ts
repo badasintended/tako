@@ -1,7 +1,8 @@
 import { fetcher } from "tako/api/fetcher";
 import type { Chapter, Manga, Page } from "tako/api/model";
-import { make } from "tako/api/model";
+import { MangaStatus } from "tako/api/model";
 import type { ParseResult, Source } from "tako/api/source";
+import { make } from "tako/api/util";
 
 const regex = {
   mcg: /\/read\/manga(?<manga>\/.*?)(?<chapter>\/.*?)(?<group>\/.*?)(\/)?$/i,
@@ -40,36 +41,32 @@ export class Guya implements Source {
     return Promise.reject();
   }
 
-  getDetails(mangaId: string): Promise<Manga> {
-    return fetcher.json<MangaSpec>(`${(this.baseUrl)}/api/series/${mangaId}`).then(manga => make<Manga>({
-      id: manga.slug,
-      source: this.id,
-      title: manga.title,
-      cover: `${this.baseUrl}${manga.cover}`,
-      authors: [manga.author],
-      artists: [manga.artist],
-      description: manga.description
-    }));
-  }
-
-  getChapters(mangaId: string): Promise<Chapter[]> {
-    return fetcher.json<MangaSpec>(`${this.baseUrl}/api/series/${mangaId}`).then(manga => {
+  getManga(mangaId: string): Promise<Manga> {
+    return fetcher.json<MangaSpec>(`${(this.baseUrl)}/api/series/${mangaId}`).then(manga => {
       const groups: string[] = [
         ...manga.preferred_sort,
         ...Object.keys(manga.groups)
       ];
-      return Object.entries(manga.chapters).map(([num, ch]) => {
-        const prevered = Object.keys(ch.groups).filter((k) => groups.includes(k))[0];
-        return make<Chapter>({
-          id: `${num}-${prevered}`,
-          source: this.id,
-          manga: mangaId,
-          number: +num,
-          volume: +ch.volume,
-          title: ch.title,
-          uploadDate: ch.release_date[prevered],
-          scanlators: manga.groups[prevered].split(" | ")
-        });
+      return make<Manga>({
+        id: manga.slug,
+        source: this.id,
+        title: manga.title,
+        cover: `${this.baseUrl}${manga.cover}`,
+        authors: [manga.author],
+        artists: [manga.artist],
+        description: manga.description,
+        status: MangaStatus.UNKNOWN,
+        chapters: Object.entries(manga.chapters).map(([num, ch]) => {
+          const preferred = Object.keys(ch.groups).filter((k) => groups.includes(k))[0];
+          return make<Chapter>({
+            id: `${num}-${preferred}`,
+            number: +num,
+            volume: +ch.volume,
+            title: ch.title,
+            uploadDate: ch.release_date[preferred],
+            scanlators: manga.groups[preferred].split(" | ")
+          });
+        })
       });
     });
   }

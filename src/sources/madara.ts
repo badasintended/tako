@@ -1,11 +1,12 @@
 import type { ParseResult, Source } from "tako/api/source";
 import type { Chapter, Manga, Page } from "tako/api/model";
-import { make } from "tako/api/model";
+import { MangaStatus } from "tako/api/model";
 import { fetcher } from "tako/api/fetcher";
 import FormData from "form-data";
 import fetch from "node-fetch";
 import cheerio from "cheerio";
 import Cheerio = cheerio.Cheerio;
+import { make } from "tako/api/util";
 
 const regex = {
   mangaChapter: /manga\/(?<manga>.*?)(\/chapter-(?<chapter>.*?))?(\?.*)?\/?$/i
@@ -31,9 +32,7 @@ export class Madara implements Source {
     const chapterId = href.match(regex.mangaChapter).groups["chapter"];
     return {
       id: chapterId,
-      source: this.id,
-      manga: mangaId,
-      number: +chapterId,
+      number: +chapterId.replace("-", "."),
       title: a.text().trim()
     };
   }
@@ -59,48 +58,47 @@ export class Madara implements Source {
   }
 
   parseUrl(url: URL): Promise<ParseResult> {
-    const match = url.pathname.match(regex.mangaChapter)
+    const match = url.pathname.match(regex.mangaChapter);
     if (match) {
       return Promise.resolve({
         sourceId: this.id,
         mangaId: match.groups["manga"],
         chapterId: match.groups["chapter"]
-      })
+      });
     }
     return;
   }
 
-  getDetails(mangaId: string): Promise<Manga> {
-    return fetcher.cheerio(`${this.baseUrl}/manga/${mangaId}`).then($ => make<Manga>({
-      source: this.id,
-      id: mangaId,
-      title: $("div.post-title h1").first().text().trim(),
-      altTitles: $(".post-content_item:contains(Alt) .summary-content").text().trim().split(", "),
-      cover: this.getImage($("div.summary_image img").first()),
-      authors: $("div.author-content > a").map((i, e) => $(e).text()).get(),
-      artists: $("div.artist-content > a").map((i, e) => $(e).text()).get(),
-      tags: $("div.genres-content a").map((i, e) => $(e).text()).get(),
-      description: $("div.description-summary div.summary__content").text().trim()
-    }));
-  }
-
-  getChapters(mangaId: string): Promise<Chapter[]> {
+  getManga(mangaId: string): Promise<Manga> {
     return fetcher.cheerio(`${this.baseUrl}/manga/${mangaId}`).then($ => {
-      const holder = $("div[id^=manga-chapters-holder]");
-      const chapters = $("li.wp-manga-chapter");
+      const chapterHolder = $("div[id^=manga-chapters-holder]");
+      const chapterElements = $("li.wp-manga-chapter");
 
-      if (chapters.length > 0) {
-        return chapters.map((i, e) => this.parseChapter(mangaId, $(e))).get();
+      let chapters: Promise<Chapter[]>;
+      if (chapterElements.length > 0) {
+        chapters = Promise.resolve(chapterElements.map((i, e) => this.parseChapter(mangaId, $(e))).get());
+      } else if (this.config.newAjax) {
+        chapters = this.getChaptersAjax(mangaId, `${this.baseUrl}/manga/${mangaId}/ajax/chapters`);
+      } else {
+        const data = new FormData();
+        data.append("action", "manga_get_chapters");
+        data.append("manga", chapterHolder.attr("data-id"));
+        chapters = this.getChaptersAjax(mangaId, `${this.baseUrl}/wp-admin/admin-ajax.php`, data);
       }
 
-      if (this.config.newAjax) {
-        return this.getChaptersAjax(mangaId, `${this.baseUrl}/manga/${mangaId}/ajax/chapters`);
-      }
-
-      const data = new FormData();
-      data.append("action", "manga_get_chapters");
-      data.append("manga", holder.attr("data-id"));
-      return this.getChaptersAjax(mangaId, `${this.baseUrl}/wp-admin/admin-ajax.php`, data);
+      return chapters.then(chapters => make<Manga>({
+        source: this.id,
+        id: mangaId,
+        title: $("div.post-title h1").first().text().trim(),
+        altTitles: $(".post-content_item:contains(Alt) .summary-content").text().trim().split(", "),
+        cover: this.getImage($("div.summary_image img").first()),
+        authors: $("div.author-content > a").map((i, e) => $(e).text()).get(),
+        artists: $("div.artist-content > a").map((i, e) => $(e).text()).get(),
+        tags: $("div.genres-content a").map((i, e) => $(e).text()).get(),
+        description: $("div.description-summary div.summary__content").text().trim(),
+        status: MangaStatus.UNKNOWN,
+        chapters: chapters
+      }));
     });
   }
 

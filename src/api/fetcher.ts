@@ -45,7 +45,7 @@ export class Fetcher {
   }
 
   next<T>(url: string): Promise<T> {
-    return this.cheerio(url).then($ => JSON.parse($("__NEXT_DATA__").html()));
+    return this.cheerio(url).then($ => JSON.parse($("#__NEXT_DATA__").first().html()));
   }
 }
 

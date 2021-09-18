@@ -1,4 +1,4 @@
-import type { Chapter, Manga, Page } from "tako/api/model";
+import type { Manga, Page } from "tako/api/model";
 
 export type ParseResult = {
   sourceId: string,
@@ -12,9 +12,7 @@ export interface Source {
 
   parseUrl(url: URL): Promise<ParseResult>
 
-  getDetails(mangaId: string): Promise<Manga>
-
-  getChapters(mangaId: string): Promise<Chapter[]>
+  getManga(mangaId: string): Promise<Manga>
 
   getPages(mangaId: string, chapterId: string): Promise<Page[]>
 }
