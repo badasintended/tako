@@ -5,8 +5,8 @@ import { fetcher } from "tako/api/fetcher";
 import FormData from "form-data";
 import fetch from "node-fetch";
 import cheerio from "cheerio";
-import Cheerio = cheerio.Cheerio;
 import { make } from "tako/api/util";
+import Cheerio = cheerio.Cheerio;
 
 const regex = {
   mangaChapter: /manga\/(?<manga>.*?)(\/chapter-(?<chapter>.*?))?(\?.*)?\/?$/i
@@ -19,11 +19,11 @@ export type MadaraConfig = {
 export class Madara implements Source {
   id: string;
   baseUrl: string;
-  config: MadaraConfig;
+  useNewAjax: boolean;
 
   constructor(baseUrl: string, conf: MadaraConfig = {}) {
     this.baseUrl = baseUrl;
-    this.config = conf;
+    this.useNewAjax = conf.newAjax ?? false;
   }
 
   parseChapter(mangaId: string, element: Cheerio): Chapter {
@@ -77,7 +77,7 @@ export class Madara implements Source {
       let chapters: Promise<Chapter[]>;
       if (chapterElements.length > 0) {
         chapters = Promise.resolve(chapterElements.map((i, e) => this.parseChapter(mangaId, $(e))).get());
-      } else if (this.config.newAjax) {
+      } else if (this.useNewAjax) {
         chapters = this.getChaptersAjax(mangaId, `${this.baseUrl}/manga/${mangaId}/ajax/chapters`);
       } else {
         const data = new FormData();

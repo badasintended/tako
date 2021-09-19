@@ -25,7 +25,6 @@ export class CatManga implements Source {
 
   getManga(mangaId: string): Promise<Manga> {
     return fetcher.next<MangaSpec>(`${(this.baseUrl)}/series/${mangaId}`).then(it => {
-      console.log(it);
       const series = it.props.pageProps.series;
       const status = series.status;
       return make<Manga>({

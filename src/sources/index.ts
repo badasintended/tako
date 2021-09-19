@@ -2,6 +2,7 @@ import { Guya } from "tako/sources/guya";
 import { CatManga } from "tako/sources/catmanga";
 import type { Source } from "tako/api/source";
 import { Madara } from "tako/sources/madara";
+import { WpMangaReader } from "tako/sources/wpmangareader";
 
 // @formatter:off
 export const sources: Record<string, Source> = {
@@ -14,7 +15,9 @@ export const sources: Record<string, Source> = {
   magicaltrans  : new Guya("https://mahoushoujobu.com"),
 
   mangasushi: new Madara("https://mangasushi.net", { newAjax: true }),
-  xun       : new Madara("https://xunscans.xyz")
+  xun       : new Madara("https://xunscans.xyz"),
+
+  anitationarts: new WpMangaReader("https://anitationarts.org")
 };
 // @formatter:on
 
