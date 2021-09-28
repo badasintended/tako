@@ -9,3 +9,4 @@ node_modules
 *.iws
 e.json
 .vercel
+.vercel_build_output
