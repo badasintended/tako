@@ -111,7 +111,7 @@
       <div class="flex flex-row-reverse p-2">
         <!-- library button -->
         <button
-          class="outline-none border rounded py-2 px-3 transition-colors duration-100 ease-in-out border-gray-200 dark:border-gray-700 text-gray-500 dark:text-one-w hover:border-gray-400 dark:hover:border-gray-500 hover:text-black dark:hover:text-white"
+          class="outline-none border rounded py-2 px-3 transition-colors duration-100 ease-in-out border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 hover:text-black dark:hover:text-white"
           on:click={libraryButton}>{bookmarkId === -1 ? "Add to" : "Remove from"} Library
         </button>
       </div>

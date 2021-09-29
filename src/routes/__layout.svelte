@@ -11,7 +11,7 @@
 </script>
 
 <div class:dark={$darkMode}>
-  <div class="w-full h-screen flex flex-col flex-auto bottom-0 dark:bg-one-b transition-colors duration-500 ease-out">
+  <div class="w-full h-screen flex flex-col flex-auto bottom-0 dark:bg-one-b transition-colors duration-500 ease-out text-gray-500 dark:text-one-w">
     <NavBar />
     <div class="flex-grow w-full overflow-y-auto overflow-y-auto">
       <div class="w-full max-w-6xl mx-auto font-sans">
