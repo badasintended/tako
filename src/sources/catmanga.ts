@@ -9,6 +9,7 @@ const regex = /\/series\/(?<manga>.*?)(\/(?<chapter>.*?))\/?$/i;
 export class CatManga implements Source {
   id: string;
   baseUrl = "https://catmanga.org";
+  imageBaseUrl = "https://images.catmanga.org"
 
   parseUrl(url: URL): Promise<ParseResult> {
     const path = url.pathname;
@@ -24,14 +25,13 @@ export class CatManga implements Source {
   }
 
   getManga(mangaId: string): Promise<Manga> {
-    return fetcher.next<MangaSpec>(`${(this.baseUrl)}/series/${mangaId}`).then(it => {
-      const series = it.props.pageProps.series;
+    return fetcher.json<MangaSpec>(`${(this.baseUrl)}/api/series/${mangaId}`).then(series => {
       const status = series.status;
       return make<Manga>({
         id: series.series_id,
         source: this.id,
         title: series.title,
-        cover: series.cover_art.source,
+        cover: this.imageBaseUrl + series.cover_art.source,
         altTitles: series.alt_titles,
         authors: series.authors,
         description: series.description,
@@ -63,28 +63,22 @@ export class CatManga implements Source {
 }
 
 type MangaSpec = {
-  props: {
-    pageProps: {
-      series: {
-        series_id: string
-        title: string
-        alt_titles: string[]
-        status: string
-        authors: string[]
-        genres: string[]
-        description: string
-        cover_art: {
-          source: string
-        }
-        chapters: [{
-          title: string
-          groups: string[]
-          number: number
-          volume: number
-        }]
-      }
-    }
+  series_id: string
+  title: string
+  alt_titles: string[]
+  status: string
+  authors: string[]
+  genres: string[]
+  description: string
+  cover_art: {
+    source: string
   }
+  chapters: [{
+    title: string
+    groups: string[]
+    number: number
+    volume: number
+  }]
 }
 
 type ChapterSpec = {
