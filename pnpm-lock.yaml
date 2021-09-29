@@ -19,6 +19,7 @@ specifiers:
   node-fetch: ^2.6.2
   postcss: ^8.3.6
   postcss-load-config: ^3.1.0
+  postcss-scss: ^4.0.0
   sass: ^1.42.1
   svelte: ^3.34.0
   svelte-check: ^2.0.0
@@ -32,7 +33,7 @@ devDependencies:
   '@fortawesome/free-brands-svg-icons': 5.15.4
   '@fortawesome/free-solid-svg-icons': 5.15.4
   '@sveltejs/adapter-vercel': 1.0.0-next.29
-  '@sveltejs/kit': 1.0.0-next.175_svelte@3.42.5
+  '@sveltejs/kit': 1.0.0-next.176_svelte@3.42.5
   '@types/cheerio': 0.22.30
   '@types/node-fetch': 2.5.12
   '@typescript-eslint/eslint-plugin': 4.31.1_e2d3c88d378335c4183365c112128ce9
@@ -47,6 +48,7 @@ devDependencies:
   node-fetch: 2.6.2
   postcss: 8.3.8
   postcss-load-config: 3.1.0
+  postcss-scss: 4.0.0_postcss@8.3.8
   sass: 1.42.1
   svelte: 3.42.5
   svelte-check: 2.2.6_b4e9b0865ff1aad4bd43f51a8da34125
@@ -167,8 +169,8 @@ packages:
       esbuild: 0.12.29
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.175_svelte@3.42.5:
-    resolution: {integrity: sha512-GRD5gdCE0kuWZLwnBkQh933dJlT6lFiglpxC3g1U2aq8c4og/2jzDqkFJLsSMTzRu17JFKni6s6ZhEwhjojTSQ==}
+  /@sveltejs/kit/1.0.0-next.176_svelte@3.42.5:
+    resolution: {integrity: sha512-aFwZ1PjOcxOSAX93Py3jfJBgZgWmANO5Vt2fb8abvNGLTA/d6VVArdPXSccaSxLYCGmgzvx+CAr8P+P8FcJ+Ng==}
     engines: {node: ^12.20 || >=14.13}
     hasBin: true
     peerDependencies:
@@ -1994,6 +1996,15 @@ packages:
       cssnano-utils: 2.0.1_postcss@8.3.8
       postcss: 8.3.8
       postcss-value-parser: 4.1.0
+    dev: true
+
+  /postcss-scss/4.0.0_postcss@8.3.8:
+    resolution: {integrity: sha512-xakgIr5ukOEyXFcsnADKjQtrk8nQyqn5VIEAA+PmPP4kBOpknmjpJMxBNqCR1/x20AS0aSfZkWsSdbMx2Ozm5A==}
+    engines: {node: '>=12.0'}
+    peerDependencies:
+      postcss: ^8.3.3
+    dependencies:
+      postcss: 8.3.8
     dev: true
 
   /postcss-selector-parser/6.0.6:

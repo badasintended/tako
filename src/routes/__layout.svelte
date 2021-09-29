@@ -1,5 +1,5 @@
 <script lang="ts">
-  import "tako/app.pcss";
+  import "tako/app.scss";
   import { darkMode } from "tako/stores";
   import { onMount } from "svelte";
   import NavBar from "tako/component/navbar/NavBar.svelte";
@@ -11,10 +11,12 @@
 </script>
 
 <div class:dark={$darkMode}>
-  <div class="w-full min-h-screen dark:bg-one-b transition-colors duration-500 ease-out">
+  <div class="w-full h-screen flex flex-col flex-auto bottom-0 dark:bg-one-b transition-colors duration-500 ease-out">
     <NavBar />
-    <div class="w-full max-w-6xl mx-auto font-sans">
-      <slot />
+    <div class="flex-grow w-full overflow-y-auto overflow-y-auto">
+      <div class="w-full max-w-6xl mx-auto font-sans">
+        <slot />
+      </div>
     </div>
   </div>
 </div>
