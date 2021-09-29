@@ -6,11 +6,13 @@
   import { database } from "tako/database";
   import ChapterSub from "tako/component/manga/ChapterSub.svelte";
   import FullScreenSpinner from "tako/component/spinner/FullScreenSpinner.svelte";
+  import Error from "tako/component/Error.svelte";
 
   const { sourceId, mangaId } = $page.params;
 
   let manga: Manga;
   let bookmarkId = -1;
+  let error = false;
 
   onMount(() => fetch(`/api/${sourceId}/${mangaId}`)
     .then(res => res.json() as Manga)
@@ -38,6 +40,7 @@
       manga = json;
       document.title = `${manga.title} | tako`;
     })
+    .catch(() => error = true)
   );
 
   function libraryButton() {
@@ -57,7 +60,11 @@
 </script>
 
 {#if (!manga)}
-  <FullScreenSpinner />
+  {#if (error)}
+    <Error message="Manga not found" />
+  {:else}
+    <FullScreenSpinner />
+  {/if}
 {:else}
   <!-- manga detail -->
   <div class="flex flex-col sm:flex-row w-full border-b border-gray-200 dark:border-gray-700">
@@ -135,9 +142,11 @@
             {/if}
           </div>
 
-          <ChapterSub>
-            {chapter.scanlators.join(", ")}
-          </ChapterSub>
+          {#if (chapter.scanlators)}
+            <ChapterSub>
+              {chapter.scanlators.join(", ")}
+            </ChapterSub>
+          {/if}
 
           <ChapterSub>
             {new Date(chapter.uploadDate * 1000).toLocaleDateString()}
