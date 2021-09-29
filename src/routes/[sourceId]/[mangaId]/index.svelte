@@ -7,41 +7,50 @@
   import ChapterSub from "tako/component/manga/ChapterSub.svelte";
   import FullScreenSpinner from "tako/component/spinner/FullScreenSpinner.svelte";
   import Error from "tako/component/Error.svelte";
+  import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
+  import Fa from "svelte-fa";
+  import { fade } from "svelte/transition";
+  import { chapterSort } from "tako/stores";
 
   const { sourceId, mangaId } = $page.params;
 
   let manga: Manga;
   let bookmarkId = -1;
   let error = false;
+  let showChapters = true;
 
-  onMount(() => fetch(`/api/${sourceId}/${mangaId}`)
-    .then(res => res.json() as Manga)
-    .then(async json => {
-      await database.libraries
-        .filter(it => it.sourceId === sourceId && it.mangaId === json.id)
-        .limit(1)
-        .eachPrimaryKey(id => bookmarkId = id);
+  onMount(() => {
+    chapterSort.set(localStorage.getItem("chapterSort") === "-1" ? 1 : -1)
+    chapterSort.subscribe(value => localStorage.setItem("chapterSort", value.toString()))
 
-      for (let chapter of json.chapters) {
-        if (!chapter.uploadDate) {
-          await database.fakeUploadTimes
-            .filter(it => it.id === json.source + json.id + chapter.id)
-            .first(it => chapter.uploadDate = it.date)
-            .catch(async () => {
-              chapter.uploadDate = Date.now() / 1000;
-              await database.fakeUploadTimes.add({
-                id: json.source + json.id + chapter.id,
-                date: chapter.uploadDate
+    fetch(`/api/${sourceId}/${mangaId}`)
+      .then(res => res.json() as Manga)
+      .then(async json => {
+        await database.libraries
+          .filter(it => it.sourceId === sourceId && it.mangaId === json.id)
+          .limit(1)
+          .eachPrimaryKey(id => bookmarkId = id);
+
+        for (let chapter of json.chapters) {
+          if (!chapter.uploadDate) {
+            await database.fakeUploadTimes
+              .filter(it => it.id === json.source + json.id + chapter.id)
+              .first(it => chapter.uploadDate = it.date)
+              .catch(async () => {
+                chapter.uploadDate = Date.now() / 1000;
+                await database.fakeUploadTimes.add({
+                  id: json.source + json.id + chapter.id,
+                  date: chapter.uploadDate
+                });
               });
-            });
+          }
         }
-      }
-      json.chapters.sort((a, b) => b.number - a.number);
-      manga = json;
-      document.title = `${manga.title} | tako`;
-    })
-    .catch(() => error = true)
-  );
+        manga = json;
+        sortChapterButton();
+        document.title = `${manga.title} | tako`;
+      })
+      .catch(() => error = true);
+  });
 
   function libraryButton() {
     if (bookmarkId !== -1) {
@@ -56,6 +65,16 @@
         cover: manga.cover
       }).then(it => bookmarkId = it);
     }
+  }
+
+  function sortChapterButton() {
+    showChapters = false;
+    chapterSort.set($chapterSort * -1);
+    manga.chapters.sort((a, b) => (a.number * $chapterSort) - (b.number * $chapterSort));
+    setTimeout(() => {
+      manga = manga;
+      showChapters = true;
+    }, 200);
   }
 </script>
 
@@ -120,47 +139,58 @@
 
   <!-- chapter list -->
   <div class="w-full max-w-3xl py-4 mx-auto divide-y divide-gray-200 dark:divide-gray-700">
-    {#each manga.chapters as chapter}
-      <div class="flex w-full p-2 group items-center">
-        <a class="flex flex-col flex-grow"
-           href="/{sourceId}/{manga.id}/{chapter.id}">
+    <div class="px-2 flex items-center">
+      {manga.chapters.length} chapters
+      <div class="flex-grow"></div>
+      <button class="flex items-center gap-x-1 h-full transition-colors duration-100 ease-in-out p-2 m-auto hover:text-black dark:hover:text-white"
+              on:click={sortChapterButton}>
+        Sort
+        <Fa icon={$chapterSort === -1 ? faCaretDown : faCaretUp} scale={1.1} />
+      </button>
+    </div>
+    {#if (showChapters)}
+      {#each manga.chapters as chapter}
+        <div class="flex w-full p-2 group items-center" transition:fade={{y: 100, duration:200}}>
+          <a class="flex flex-col flex-grow"
+             href="/{sourceId}/{manga.id}/{chapter.id}">
 
-          {#if (chapter.name)}
-            <ChapterSub>
-              {chapter.volume !== undefined ? `Volume ${chapter.volume} - ` : ""}
-              Chapter {chapter.number}
-            </ChapterSub>
-          {/if}
-
-          <div
-            class="text-left leading-none py-1 transition-colors duration-100 ease-in-out text-gray-500 group-hover:text-black dark:group-hover:text-one-w">
             {#if (chapter.name)}
-              {chapter.name}
-            {:else }
-              {chapter.volume !== undefined ? `Volume ${chapter.volume} - ` : ""}
-              Chapter {chapter.number}
+              <ChapterSub>
+                {chapter.volume !== undefined ? `Volume ${chapter.volume} - ` : ""}
+                Chapter {chapter.number}
+              </ChapterSub>
             {/if}
-          </div>
 
-          {#if (chapter.scanlators)}
+            <div
+              class="text-left leading-none py-1 transition-colors duration-100 ease-in-out text-gray-500 group-hover:text-black dark:group-hover:text-one-w">
+              {#if (chapter.name)}
+                {chapter.name}
+              {:else }
+                {chapter.volume !== undefined ? `Volume ${chapter.volume} - ` : ""}
+                Chapter {chapter.number}
+              {/if}
+            </div>
+
+            {#if (chapter.scanlators)}
+              <ChapterSub>
+                {chapter.scanlators.join(", ")}
+              </ChapterSub>
+            {/if}
+
             <ChapterSub>
-              {chapter.scanlators.join(", ")}
+              {new Date(chapter.uploadDate * 1000).toLocaleDateString()}
             </ChapterSub>
-          {/if}
+          </a>
 
-          <ChapterSub>
-            {new Date(chapter.uploadDate * 1000).toLocaleDateString()}
-          </ChapterSub>
-        </a>
-
-        <!--        &lt;!&ndash; show an icon if chapter already read &ndash;&gt;-->
-        <!--        {#if readChapters.includes(chapter.id)}-->
-        <!--          <div class="text-gray-400">-->
-        <!--            <EyeIcon />-->
-        <!--          </div>-->
-        <!--        {/if}-->
-      </div>
-    {/each}
+          <!--        &lt;!&ndash; show an icon if chapter already read &ndash;&gt;-->
+          <!--        {#if readChapters.includes(chapter.id)}-->
+          <!--          <div class="text-gray-400">-->
+          <!--            <EyeIcon />-->
+          <!--          </div>-->
+          <!--        {/if}-->
+        </div>
+      {/each}
+    {/if}
   </div>
 
 {/if}

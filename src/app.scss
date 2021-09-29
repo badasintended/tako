@@ -4,14 +4,27 @@
 @tailwind components;
 @tailwind utilities;
 
-::-webkit-scrollbar {
-  width: 5px;
+.scroller {
+  border-color: #6B7280;
 
-  &-track {
-    background: transparent;
+  &.scroller-hidden {
+    border-color: transparent;
+    transition-duration: 250ms;
+    transition-property: border-right-color;
+    transition-timing-function: ease-out;
   }
 
-  &-thumb {
-    background: #6B7280;
+  &::-webkit-scrollbar {
+    width: 5px;
+
+    &-track {
+      background: transparent;
+    }
+
+    &-thumb {
+      border-color: inherit;
+      border-right-width: 5px;
+      border-right-style: inset;
+    }
   }
 }
