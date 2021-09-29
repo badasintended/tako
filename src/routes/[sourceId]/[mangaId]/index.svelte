@@ -5,6 +5,7 @@
   import Detail from "tako/component/manga/Detail.svelte";
   import { database } from "tako/database";
   import ChapterSub from "tako/component/manga/ChapterSub.svelte";
+  import FullScreenSpinner from "tako/component/spinner/FullScreenSpinner.svelte";
 
   const { sourceId, mangaId } = $page.params;
 
@@ -55,7 +56,9 @@
   }
 </script>
 
-{#if (manga)}
+{#if (!manga)}
+  <FullScreenSpinner />
+{:else}
   <!-- manga detail -->
   <div class="flex flex-col sm:flex-row w-full border-b border-gray-200 dark:border-gray-700">
     <!-- cover -->

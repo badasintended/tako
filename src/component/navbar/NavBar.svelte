@@ -12,7 +12,7 @@
 
 <!-- navbar -->
 <div
-  class="navbar sticky top-0 w-full h-14 transition-colors duration-500 ease-out border-b border-gray-200 bg-white dark:bg-one-b dark:border-gray-700 text-gray-500 dark:text-one-w">
+  class="navbar z-50 sticky top-0 w-full h-14 transition-colors duration-500 ease-out border-b border-gray-200 bg-white dark:bg-one-b dark:border-gray-700 text-gray-500 dark:text-one-w">
   <div class="max-w-6xl mx-auto h-full flex px-4">
     <Link href="/">library</Link>
     <Link href="/history">history</Link>
