@@ -14,7 +14,7 @@ export const sources: Record<string, Source> = {
   hachirumi     : new Guya("https://hachirumi.com"),
   magicaltrans  : new Guya("https://mahoushoujobu.com"),
 
-  mangasushi: new Madara("https://mangasushi.net", { newAjax: true }),
+//mangasushi: new Madara("https://mangasushi.net", { newAjax: true }),
   xun       : new Madara("https://xunscans.xyz"),
 
   anitationarts: new WpMangaReader("https://anitationarts.org")
