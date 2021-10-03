@@ -1,3 +1,21 @@
+<script context="module" lang="ts">
+  import type { LoadInput, LoadOutput } from "@sveltejs/kit";
+  import type { ParseResult } from "tako/api/source";
+
+  export async function load(ctx: LoadInput): Promise<LoadOutput> {
+    const parse = ctx.page.query.get("q");
+    if (!parse) return {};
+
+    const res = await ctx.fetch(`/api/parse?q=${parse}`);
+    if (!res.ok) return {};
+    const json: ParseResult = await res.json();
+    return {
+      status: 301,
+      redirect: `/${json.sourceId}/${json.mangaId}/${json.chapterId ?? ""}`
+    };
+  }
+</script>
+
 <script lang="ts">
   import type { Bookmark } from "tako/database";
   import { database } from "tako/database";
@@ -13,9 +31,8 @@
   });
 </script>
 
-<Title title="library"/>
-
-<div class="pt-2 mb-4">
+<Title title="library" />
+<div class="mb-4">
   <div class="flex flex-wrap justify-center">
     {#each bookmarks as bookmark}
       <a class="flex flex-col w-40 h-72 m-2 group"

@@ -4,12 +4,12 @@ import { MangaStatus } from "tako/api/model";
 import { fetcher } from "tako/api/fetcher";
 import { make } from "tako/api/util";
 
-const regex = /\/series\/(?<manga>.*?)(\/(?<chapter>.*?))\/?$/i;
+const regex = /\/series\/(?<manga>.*?)(\/(?<chapter>.*?))?\/?$/i;
 
 export class CatManga implements Source {
   id: string;
   baseUrl = "https://catmanga.org";
-  imageBaseUrl = "https://images.catmanga.org"
+  imageBaseUrl = "https://images.catmanga.org";
 
   parseUrl(url: URL): Promise<ParseResult> {
     const path = url.pathname;
