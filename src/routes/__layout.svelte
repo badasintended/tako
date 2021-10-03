@@ -11,8 +11,6 @@
   let msSinceLastScroll = 0;
 
   onMount(() => {
-    document.title = "tako";
-
     darkMode.set(localStorage.getItem("darkMode") === "true");
     darkMode.subscribe(value => localStorage.setItem("darkMode", value ? "true" : "false"));
 

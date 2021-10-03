@@ -2,6 +2,7 @@
   import type { Bookmark } from "tako/database";
   import { database } from "tako/database";
   import { onMount } from "svelte";
+  import Title from "tako/component/Title.svelte";
 
   let bookmarks: Bookmark[] = [];
 
@@ -11,6 +12,8 @@
       .then(it => bookmarks = it.sort((a, b) => a.title.localeCompare(b.title)));
   });
 </script>
+
+<Title title="library"/>
 
 <div class="pt-2 mb-4">
   <div class="flex flex-wrap justify-center">

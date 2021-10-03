@@ -11,6 +11,7 @@
   import Fa from "svelte-fa";
   import { fade } from "svelte/transition";
   import { chapterSort } from "tako/stores";
+  import Title from "tako/component/Title.svelte";
 
   const { sourceId, mangaId } = $page.params;
 
@@ -20,8 +21,8 @@
   let showChapters = true;
 
   onMount(() => {
-    chapterSort.set(localStorage.getItem("chapterSort") === "-1" ? 1 : -1)
-    chapterSort.subscribe(value => localStorage.setItem("chapterSort", value.toString()))
+    chapterSort.set(localStorage.getItem("chapterSort") === "-1" ? 1 : -1);
+    chapterSort.subscribe(value => localStorage.setItem("chapterSort", value.toString()));
 
     fetch(`/api/${sourceId}/${mangaId}`)
       .then(res => res.json() as Manga)
@@ -47,7 +48,6 @@
         }
         manga = json;
         sortChapterButton();
-        document.title = `${manga.title} | tako`;
       })
       .catch(() => error = true);
   });
@@ -77,6 +77,8 @@
     }, 200);
   }
 </script>
+
+<Title title={manga?.title} />
 
 {#if (!manga)}
   {#if (error)}

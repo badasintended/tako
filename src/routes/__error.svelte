@@ -12,8 +12,10 @@
 
 <script lang="ts">
   import Error from "tako/component/Error.svelte";
+  import Title from "tako/component/Title.svelte";
 
   export let message: string;
 </script>
 
+<Title title="error" />
 <Error {message} />
