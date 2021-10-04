@@ -10,9 +10,9 @@ export interface Source {
   id: string;
   baseUrl: string;
 
-  parseUrl(url: URL): Promise<ParseResult>
+  parseUrl(url: URL): Promise<ParseResult>;
 
-  getManga(mangaId: string): Promise<Manga>
+  getManga(mangaId: string): Promise<Manga>;
 
-  getPages(mangaId: string, chapterId: string): Promise<Page[]>
+  getPages(mangaId: string, chapterId: string): Promise<Page[]>;
 }

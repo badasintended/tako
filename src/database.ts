@@ -14,7 +14,7 @@ export type ReadChapter = {
   mangaId: string
   chapterId: string
   lastPage: number
-  totalPage:number
+  totalPage: number
 }
 
 export type FakeUploadTime = {
