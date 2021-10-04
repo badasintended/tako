@@ -1,9 +1,13 @@
 <script lang="ts">
   import "tako/app.scss";
-  import { darkMode } from "tako/stores";
+  import { darkMode, showNavBar } from "tako/stores";
   import { onMount } from "svelte";
   import NavBar from "tako/component/navbar/NavBar.svelte";
   import { page } from "$app/stores";
+
+  $: if ($page) {
+    $showNavBar = true;
+  }
 
   let showScrollBar = false;
   let mouseX = 0;
@@ -32,7 +36,9 @@
 
 <div class:dark={$darkMode}>
   <div class="w-full h-screen flex flex-col flex-auto bottom-0 dark:bg-one-b transition-colors duration-500 ease-out text-gray-500 dark:text-one-w">
-    <NavBar />
+    {#if ($showNavBar)}
+      <NavBar />
+    {/if}
     {#key $page.path}
       <div class="scroller flex-grow w-full overflow-y-auto overflow-y-scroll"
            class:scroller-hidden={!showScrollBar}

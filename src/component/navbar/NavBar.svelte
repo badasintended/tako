@@ -4,6 +4,7 @@
   import { faGithub } from "@fortawesome/free-brands-svg-icons";
   import Link from "tako/component/navbar/Link.svelte";
   import Fa from "svelte-fa";
+  import Button from "tako/component/Button.svelte";
 
   function toggleDarkMode() {
     darkMode.set(!$darkMode);
@@ -20,10 +21,9 @@
 
     <div class="flex-grow"></div>
 
-    <button class="h-full my-auto transition-colors duration-100 ease-in-out p-2 m-auto hover:text-black dark:hover:text-white"
-            on:click={toggleDarkMode}>
+    <Button onclick={toggleDarkMode}>
       <Fa icon={$darkMode ? faMoon : faSun} scale={1.1} />
-    </button>
+    </Button>
 
     <Link href="https://github.com/badasintended/tako">
       <Fa icon={faGithub} scale={1.1} />

@@ -1,17 +1,18 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { page } from "$app/stores";
-  import type { Manga } from "tako/api/model";
+  import type { Chapter, Manga } from "tako/api/model";
   import Detail from "tako/component/manga/Detail.svelte";
   import { database } from "tako/database";
   import ChapterSub from "tako/component/manga/ChapterSub.svelte";
   import FullScreenSpinner from "tako/component/spinner/FullScreenSpinner.svelte";
   import Error from "tako/component/Error.svelte";
-  import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
+  import { faCaretDown, faCaretUp, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
   import Fa from "svelte-fa";
   import { fade } from "svelte/transition";
-  import { chapterSort } from "tako/stores";
+  import { chapterSort, currentManga } from "tako/stores";
   import Title from "tako/component/Title.svelte";
+  import Button from "tako/component/Button.svelte";
 
   const { sourceId, mangaId } = $page.params;
 
@@ -19,6 +20,7 @@
   let bookmarkId = -1;
   let error = false;
   let showChapters = true;
+  let readChapters = new Set<string>();
 
   onMount(() => {
     chapterSort.set(localStorage.getItem("chapterSort") === "-1" ? 1 : -1);
@@ -31,6 +33,10 @@
           .filter(it => it.sourceId === sourceId && it.mangaId === json.id)
           .limit(1)
           .eachPrimaryKey(id => bookmarkId = id);
+
+        database.readChapters
+          .filter(it => it.sourceId === sourceId && it.mangaId === mangaId)
+          .each(it => readChapters.add(it.chapterId));
 
         for (let chapter of json.chapters) {
           if (!chapter.uploadDate) {
@@ -47,6 +53,7 @@
           }
         }
         manga = json;
+        $currentManga = manga;
         sortChapterButton();
       })
       .catch(() => error = true);
@@ -75,6 +82,25 @@
       manga = manga;
       showChapters = true;
     }, 200);
+  }
+
+  function readButton(chapter: Chapter) {
+    let promise: Promise<any>;
+    if (readChapters.has(chapter.id)) {
+      promise = database.readChapters
+        .filter(it => it.sourceId === sourceId && it.mangaId === mangaId && it.chapterId === chapter.id)
+        .delete()
+        .then(() => readChapters.delete(chapter.id));
+    } else {
+      promise = database.readChapters.add({
+        sourceId: sourceId,
+        mangaId: mangaId,
+        chapterId: chapter.id,
+        lastPage: 0,
+        totalPage: 0
+      }).then(() => readChapters.add(chapter.id));
+    }
+    promise.then(() => readChapters = readChapters);
   }
 </script>
 
@@ -152,8 +178,8 @@
     </div>
     {#if (showChapters)}
       {#each manga.chapters as chapter}
-        <div class="flex w-full p-2 group items-center" transition:fade={{y: 100, duration:200}}>
-          <a class="flex flex-col flex-grow"
+        <div class="flex w-full p-2 items-center" transition:fade={{y: 100, duration:200}}>
+          <a class="flex flex-col group flex-grow hover:text-black dark:hover:text-white"
              href="/{sourceId}/{manga.id}/{chapter.id}">
 
             {#if (chapter.name)}
@@ -164,7 +190,7 @@
             {/if}
 
             <div
-              class="text-left leading-none py-1 transition-colors duration-100 ease-in-out text-gray-500 group-hover:text-black dark:group-hover:text-one-w">
+              class="text-left leading-none py-1">
               {#if (chapter.name)}
                 {chapter.name}
               {:else }
@@ -184,12 +210,13 @@
             </ChapterSub>
           </a>
 
-          <!--        &lt;!&ndash; show an icon if chapter already read &ndash;&gt;-->
-          <!--        {#if readChapters.includes(chapter.id)}-->
-          <!--          <div class="text-gray-400">-->
-          <!--            <EyeIcon />-->
-          <!--          </div>-->
-          <!--        {/if}-->
+          {#key readChapters}
+            <div class={!readChapters.has(chapter.id) ? "text-gray-300 dark:text-gray-600" : ""}>
+              <Button onclick={() => readButton(chapter)}>
+                <Fa icon={readChapters.has(chapter.id) ? faEye : faEyeSlash} />
+              </Button>
+            </div>
+          {/key}
         </div>
       {/each}
     {/if}
