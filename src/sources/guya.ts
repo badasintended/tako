@@ -17,7 +17,7 @@ export class Guya implements Source {
     this.baseUrl = baseUrl;
   }
 
-  parseUrl(url: URL): Promise<ParseResult> {
+  parseUrl(url: URL): Promise<ParseResult | undefined> {
     const path = url.pathname;
     console.log(path);
     const mcg = path.match(regex.mcg);
@@ -37,8 +37,6 @@ export class Guya implements Source {
         mangaId: m.groups["manga"].substr(1)
       });
     }
-
-    return Promise.reject();
   }
 
   getManga(mangaId: string): Promise<Manga> {

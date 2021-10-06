@@ -1,30 +1,21 @@
-<script context="module" lang="ts">
-  import type { LoadInput, LoadOutput } from "@sveltejs/kit";
-  import type { ParseResult } from "tako/api/source";
-
-  export async function load(ctx: LoadInput): Promise<LoadOutput> {
-    const parse = ctx.page.query.get("q");
-    if (!parse) return {};
-
-    const res = await ctx.fetch(`/api/parse?q=${parse}`);
-    if (!res.ok) return {};
-    const json: ParseResult = await res.json();
-    return {
-      status: 301,
-      redirect: `/${json.sourceId}/${json.mangaId}/${json.chapterId ?? ""}`
-    };
-  }
-</script>
-
 <script lang="ts">
   import type { Bookmark } from "tako/database";
   import { database } from "tako/database";
   import { onMount } from "svelte";
   import Title from "tako/component/Title.svelte";
+  import { page } from "$app/stores";
+  import { parseUrl } from "tako/api/source";
+  import { goto } from "$app/navigation";
 
   let bookmarks: Bookmark[] = [];
 
   onMount(() => {
+    const parse = $page.query.get("q");
+    if (parse) {
+      parseUrl(parse)
+        .then(res => goto(`/${res.sourceId}/${res.mangaId}/${res.chapterId ?? ""}`, { replaceState: true }));
+    }
+
     database.libraries
       .toArray()
       .then(it => bookmarks = it.sort((a, b) => a.title.localeCompare(b.title)));

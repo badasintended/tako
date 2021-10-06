@@ -2,9 +2,10 @@
   import { page } from "$app/stores";
   import { currentManga, showNavBar } from "tako/stores";
   import { onMount } from "svelte";
-  import type { Chapter, Manga, Page } from "tako/api/model";
+  import type { Chapter, Page } from "tako/api/model";
   import { database } from "tako/database";
   import { goto } from "$app/navigation";
+  import { getManga, getPages } from "tako/api/source";
 
   const { sourceId, mangaId, chapterId } = $page.params;
 
@@ -23,16 +24,14 @@
   onMount(() => {
     let promise: Promise<any>;
     if (!(manga && manga.source === sourceId && manga.id === mangaId)) {
-      promise = fetch(`/api/${sourceId}/${mangaId}`)
-        .then(it => it.json() as Manga)
+      promise = getManga(sourceId, mangaId)
         .then(it => $currentManga = manga = it);
     } else {
       promise = Promise.resolve();
     }
 
     promise.then(() =>
-      fetch(`/api/${sourceId}/${mangaId}/${chapterId}`)
-        .then(it => it.json() as Page[])
+      getPages(sourceId, mangaId, chapterId)
         .then(it => {
           chapters = manga.chapters.sort((a, b) => b.number - a.number);
           const i = chapters.findIndex((ch) => ch.id === chapterId);

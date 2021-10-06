@@ -13,6 +13,7 @@
   import { chapterSort, currentManga } from "tako/stores";
   import Title from "tako/component/Title.svelte";
   import Button from "tako/component/Button.svelte";
+  import { getManga } from "tako/api/source";
 
   const { sourceId, mangaId } = $page.params;
 
@@ -26,8 +27,7 @@
     chapterSort.set(localStorage.getItem("chapterSort") === "-1" ? 1 : -1);
     chapterSort.subscribe(value => localStorage.setItem("chapterSort", value.toString()));
 
-    fetch(`/api/${sourceId}/${mangaId}`)
-      .then(res => res.json() as Manga)
+    getManga(sourceId, mangaId)
       .then(async json => {
         await database.libraries
           .filter(it => it.sourceId === sourceId && it.mangaId === json.id)

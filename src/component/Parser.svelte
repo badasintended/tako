@@ -1,13 +1,12 @@
 <script lang="ts">
-  import type { ParseResult } from "tako/api/source";
+  import { parseUrl } from "tako/api/source";
   import { goto } from "$app/navigation";
 
   let url: string;
 
   function onKeyPress(event: KeyboardEvent) {
     if (url && event.key === "Enter") {
-      fetch(`/api/parse?q=${url}`)
-        .then(it => it.json() as ParseResult)
+      parseUrl(url)
         .then(it => goto(`/${it.sourceId}/${it.mangaId}/${it.chapterId ?? ""}`));
     }
   }

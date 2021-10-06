@@ -1,4 +1,3 @@
-import fetch, { HeadersInit } from "node-fetch";
 import cheerio from "cheerio";
 import Root = cheerio.Root;
 
@@ -16,7 +15,6 @@ function getCacheOrDefault(
   }
 
   if (!cache[url]) {
-    console.log(`sent request to ${url}`);
     return fun(url).then((it) => (cache[url] = it));
   } else {
     return Promise.resolve(cache[url]);
@@ -32,7 +30,7 @@ export class Fetcher {
 
   raw(url: string): Promise<string> {
     return getCacheOrDefault(url, url =>
-      fetch(url, { headers: this.headers })
+      fetch(cors(url), { headers: this.headers })
         .then(res => res.text()));
   }
 
@@ -50,3 +48,7 @@ export class Fetcher {
 }
 
 export const fetcher = new Fetcher();
+
+export function cors(url: string): string {
+  return `https://cors.bridged.cc/${url}`;
+}

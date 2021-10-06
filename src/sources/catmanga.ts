@@ -21,7 +21,6 @@ export class CatManga implements Source {
         chapterId: match.groups["chapter"]
       });
     }
-    return Promise.reject();
   }
 
   getManga(mangaId: string): Promise<Manga> {

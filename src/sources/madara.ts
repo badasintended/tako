@@ -1,9 +1,7 @@
 import type { ParseResult, Source } from "tako/api/source";
 import type { Chapter, Manga, Page } from "tako/api/model";
 import { MangaStatus } from "tako/api/model";
-import { fetcher } from "tako/api/fetcher";
-import FormData from "form-data";
-import fetch from "node-fetch";
+import { cors, fetcher } from "tako/api/fetcher";
 import cheerio from "cheerio";
 import { make } from "tako/api/util";
 import Cheerio = cheerio.Cheerio;
@@ -37,8 +35,8 @@ export class Madara implements Source {
     };
   }
 
-  getChaptersAjax(mangaId: string, url: string, data?: FormData): Promise<Chapter[]> {
-    return fetch(url, {
+  getChaptersAjax(mangaId: string, url: string, data?: URLSearchParams): Promise<Chapter[]> {
+    return fetch(cors(url), {
       method: "post",
       body: data
     }).then(res => res.text())
@@ -66,7 +64,6 @@ export class Madara implements Source {
         chapterId: match.groups["chapter"]
       });
     }
-    return;
   }
 
   getManga(mangaId: string): Promise<Manga> {
@@ -80,7 +77,7 @@ export class Madara implements Source {
       } else if (this.useNewAjax) {
         chapters = this.getChaptersAjax(mangaId, `${this.baseUrl}/manga/${mangaId}/ajax/chapters`);
       } else {
-        const data = new FormData();
+        const data = new URLSearchParams();
         data.append("action", "manga_get_chapters");
         data.append("manga", chapterHolder.attr("data-id"));
         chapters = this.getChaptersAjax(mangaId, `${this.baseUrl}/wp-admin/admin-ajax.php`, data);
