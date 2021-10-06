@@ -31,8 +31,8 @@ export class TakoDatabase extends Dexie {
     super("TakoDatabase");
     this.version(1).stores({
       libraries: "id++,sourceId,mangaId",
-      readChapters: "id++,sourceId,mangaId,chapterId,lastPage,totalPage",
-      fakeUploadTimes: "id,date"
+      readChapters: "id++,sourceId,mangaId,chapterId",
+      fakeUploadTimes: "id"
     });
   }
 }
