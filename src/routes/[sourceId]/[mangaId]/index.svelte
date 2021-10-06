@@ -151,7 +151,7 @@
 
       {#if (manga.description)}
         <Detail key="Description">
-          <div class="manga-desc">{@html manga.description}</div>
+          <div class="manga-desc whitespace-pre-line">{@html manga.description}</div>
         </Detail>
       {/if}
 
@@ -182,7 +182,7 @@
           <a class="flex flex-col group flex-grow hover:text-black dark:hover:text-white"
              href="/{sourceId}/{manga.id}/{chapter.id}">
 
-            {#if (chapter.name)}
+            {#if (chapter.title)}
               <ChapterSub>
                 {chapter.volume !== undefined ? `Volume ${chapter.volume} - ` : ""}
                 Chapter {chapter.number}
@@ -191,22 +191,16 @@
 
             <div
               class="text-left leading-none py-1">
-              {#if (chapter.name)}
-                {chapter.name}
+              {#if (chapter.title)}
+                {chapter.title}
               {:else }
                 {chapter.volume !== undefined ? `Volume ${chapter.volume} - ` : ""}
                 Chapter {chapter.number}
               {/if}
             </div>
 
-            {#if (chapter.scanlators)}
-              <ChapterSub>
-                {chapter.scanlators.join(", ")}
-              </ChapterSub>
-            {/if}
-
             <ChapterSub>
-              {new Date(chapter.uploadDate * 1000).toLocaleDateString()}
+              { (chapter.scanlators?.join(", ")?.concat(" - ") ?? "") + new Date(chapter.uploadDate * 1000).toLocaleDateString() }
             </ChapterSub>
           </a>
 
