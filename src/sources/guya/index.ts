@@ -20,9 +20,7 @@ export class Guya implements Source {
 
   parseUrl(url: URL): Promise<ParseResult | undefined> {
     const path = url.pathname;
-    console.log(path);
     const mcg = path.match(regex.mcg);
-    console.log(mcg);
     if (mcg) {
       return Promise.resolve({
         sourceId: this.id,
