@@ -3,6 +3,7 @@ import type { Chapter, Manga, Page } from "tako/api/model";
 import { MangaStatus } from "tako/api/model";
 import { fetcher } from "tako/api/fetcher";
 import { make } from "tako/api/util";
+import type { ChapterSpec, MangaSpec } from "tako/sources/catmanga/spec";
 
 const regex = /\/series\/(?<manga>.*?)(\/(?<chapter>.*?))?\/?$/i;
 
@@ -58,32 +59,5 @@ export class CatManga implements Source {
         });
       })
     );
-  }
-}
-
-type MangaSpec = {
-  series_id: string
-  title: string
-  alt_titles: string[]
-  status: string
-  authors: string[]
-  genres: string[]
-  description: string
-  cover_art: {
-    source: string
-  }
-  chapters: [{
-    title: string
-    groups: string[]
-    number: number
-    volume: number
-  }]
-}
-
-type ChapterSpec = {
-  props: {
-    pageProps: {
-      pages: string[]
-    }
   }
 }
