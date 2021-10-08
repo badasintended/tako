@@ -47,6 +47,7 @@ export class Guya implements Source {
       return make<Manga>({
         id: manga.slug,
         source: this.id,
+        url: `${this.baseUrl}/read/manga/${mangaId}`,
         title: manga.title,
         cover: `${this.baseUrl}${manga.cover}`,
         authors: [manga.author],

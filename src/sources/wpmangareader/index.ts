@@ -40,6 +40,7 @@ export class WpMangaReader implements Source {
       return make<Manga>({
         id: mangaId,
         source: this.id,
+        url: `${this.baseUrl}/${this.mangaDir}/${mangaId}`,
         title: $("h1.entry-title").first().text(),
         cover: $(".thumb img").first().attr("src"),
         authors: [$(".tsinfo .imptdt:contains(Author) i").first().text()],

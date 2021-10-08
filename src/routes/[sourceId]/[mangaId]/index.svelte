@@ -3,17 +3,19 @@
   import { page } from "$app/stores";
   import type { Chapter, Manga } from "tako/api/model";
   import Detail from "tako/component/manga/Detail.svelte";
-  import { database } from "tako/database";
+  import { cacheDb, database } from "tako/api/database";
   import ChapterSub from "tako/component/manga/ChapterSub.svelte";
   import FullScreenSpinner from "tako/component/spinner/FullScreenSpinner.svelte";
   import Error from "tako/component/Error.svelte";
-  import { faCaretDown, faCaretUp, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+  import { faCaretDown, faCaretUp, faExternalLinkAlt, faEye, faEyeSlash, faHeart, faRedoAlt } from "@fortawesome/free-solid-svg-icons";
   import Fa from "svelte-fa";
   import { fade } from "svelte/transition";
-  import { chapterSort, currentManga } from "tako/stores";
+  import { chapterSort, currentManga } from "tako/api/stores";
   import Title from "tako/component/Title.svelte";
-  import Button from "tako/component/Button.svelte";
   import { getManga } from "tako/api/source";
+  import ToggleButton from "tako/component/button/ToggleButton.svelte";
+  import Button from "tako/component/button/Button.svelte";
+  import LinkButton from "tako/component/button/LinkButton.svelte";
 
   const { sourceId, mangaId } = $page.params;
 
@@ -24,9 +26,10 @@
   let readChapters = new Set<string>();
 
   onMount(() => {
-    chapterSort.set(localStorage.getItem("chapterSort") === "-1" ? 1 : -1);
-    chapterSort.subscribe(value => localStorage.setItem("chapterSort", value.toString()));
+    loadManga();
+  });
 
+  function loadManga() {
     getManga(sourceId, mangaId)
       .then(async json => {
         await database.libraries
@@ -54,10 +57,18 @@
         }
         manga = json;
         $currentManga = manga;
-        sortChapterButton();
+        sortChapters();
       })
       .catch(() => error = true);
-  });
+  }
+
+  function sortChapters() {
+    manga.chapters.sort((a, b) => (a.number * $chapterSort) - (b.number * $chapterSort));
+    setTimeout(() => {
+      manga = manga;
+      showChapters = true;
+    }, 200);
+  }
 
   function libraryButton() {
     if (bookmarkId !== -1) {
@@ -74,14 +85,20 @@
     }
   }
 
+  function refreshButton() {
+    $currentManga = manga = undefined;
+    error = false;
+
+    cacheDb.manga
+      .where({ source: sourceId, id: mangaId })
+      .delete()
+      .then(() => loadManga());
+  }
+
   function sortChapterButton() {
     showChapters = false;
     chapterSort.set($chapterSort * -1);
-    manga.chapters.sort((a, b) => (a.number * $chapterSort) - (b.number * $chapterSort));
-    setTimeout(() => {
-      manga = manga;
-      showChapters = true;
-    }, 200);
+    sortChapters();
   }
 
   function readButton(chapter: Chapter) {
@@ -157,10 +174,15 @@
 
       <div class="flex flex-row-reverse p-2">
         <!-- library button -->
-        <button
-          class="outline-none border rounded py-2 px-3 transition-colors duration-100 ease-in-out border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 hover:text-black dark:hover:text-white"
-          on:click={libraryButton}>{bookmarkId === -1 ? "Add to" : "Remove from"} Library
-        </button>
+        <LinkButton href={manga.url} newTab={true}>
+          <Fa icon={faExternalLinkAlt} scale={1.25} />
+        </LinkButton>
+        <Button onClick={refreshButton}>
+          <Fa icon={faRedoAlt} scale={1.25} />
+        </Button>
+        <ToggleButton state={bookmarkId !== -1} onClick={libraryButton}>
+          <Fa icon={faHeart} scale={1.25} class={bookmarkId !== -1 ? "text-red-400" : ""} />
+        </ToggleButton>
       </div>
     </div>
   </div>
@@ -205,11 +227,10 @@
           </a>
 
           {#key readChapters}
-            <div class={!readChapters.has(chapter.id) ? "text-gray-300 dark:text-gray-600" : ""}>
-              <Button onclick={() => readButton(chapter)}>
-                <Fa icon={readChapters.has(chapter.id) ? faEye : faEyeSlash} />
-              </Button>
-            </div>
+            <ToggleButton state={readChapters.has(chapter.id)}
+                          onClick={() => readButton(chapter)}>
+              <Fa fw={true} icon={readChapters.has(chapter.id) ? faEye : faEyeSlash} />
+            </ToggleButton>
           {/key}
         </div>
       {/each}

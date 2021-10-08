@@ -1,26 +1,7 @@
 import cheerio from "cheerio";
-import Dexie from "dexie";
 import { MINUTE } from "tako/api/time-constants";
+import { cacheDb } from "tako/api/database";
 import Root = cheerio.Root;
-
-type Cache = {
-  url: string
-  time: number
-  body: string
-}
-
-class CacheDatabase extends Dexie {
-  caches: Dexie.Table<Cache, string>;
-
-  constructor() {
-    super("CacheDatabase");
-    this.version(1).stores({
-      caches: "url"
-    });
-  }
-}
-
-const cache = new CacheDatabase();
 
 async function getCacheOrDefault(
   url: string,
@@ -30,11 +11,11 @@ async function getCacheOrDefault(
   if (cacheTime <= 0) return fun(url);
 
   const now = Date.now();
-  return cache.caches
+  return cacheDb.fetcher
     .get(url, it => {
       if (now - it.time >= cacheTime) {
         return fun(url).then(it => {
-          cache.caches.update(url, { time: now, body: it });
+          cacheDb.fetcher.update(url, { time: now, body: it });
           return it;
         });
       } else {
@@ -42,7 +23,7 @@ async function getCacheOrDefault(
       }
     })
     .catch(() => fun(url).then(it => {
-      cache.caches.put({ url, time: now, body: it });
+      cacheDb.fetcher.put({ url, time: now, body: it });
       return it;
     }));
 }
@@ -55,6 +36,7 @@ export class Fetcher {
   }
 
   raw(url: string, cacheTime = 10 * MINUTE): Promise<string> {
+    console.log(url);
     return getCacheOrDefault(url, cacheTime, url =>
       fetch(cors(url), { headers: this.headers })
         .then(res => res.text()));

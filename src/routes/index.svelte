@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { Bookmark } from "tako/database";
-  import { database } from "tako/database";
+  import type { Bookmark } from "tako/api/database";
+  import { database } from "tako/api/database";
   import { onMount } from "svelte";
   import Title from "tako/component/Title.svelte";
   import { page } from "$app/stores";

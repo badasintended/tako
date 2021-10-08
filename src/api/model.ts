@@ -8,6 +8,7 @@ export enum MangaStatus {
 export type Manga = {
   id: string
   source: string
+  url: string
   title: string
   cover: string
   status: MangaStatus

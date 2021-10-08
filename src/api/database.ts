@@ -1,4 +1,5 @@
 import Dexie from "dexie";
+import type { Manga } from "tako/api/model";
 
 export type Bookmark = {
   id?: number
@@ -38,3 +39,24 @@ export class TakoDatabase extends Dexie {
 }
 
 export const database = new TakoDatabase();
+
+type FetcherCache = {
+  url: string
+  time: number
+  body: string
+}
+
+class CacheDatabase extends Dexie {
+  fetcher: Dexie.Table<FetcherCache, string>;
+  manga: Dexie.Table<Manga>;
+
+  constructor() {
+    super("CacheDatabase");
+    this.version(2).stores({
+      fetcher: "url",
+      manga: "[source+id]"
+    });
+  }
+}
+
+export const cacheDb = new CacheDatabase();

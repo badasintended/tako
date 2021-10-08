@@ -1,9 +1,10 @@
 <script lang="ts">
   import "tako/app.scss";
-  import { darkMode, showNavBar } from "tako/stores";
+  import { chapterSort, darkMode, showNavBar } from "tako/api/stores";
   import { onMount } from "svelte";
   import NavBar from "tako/component/navbar/NavBar.svelte";
   import { page } from "$app/stores";
+  import { cacheDb } from "tako/api/database";
 
   $: if ($page) {
     $showNavBar = true;
@@ -14,7 +15,17 @@
   let scrolling = false;
   let msSinceLastScroll = 0;
 
-  onMount(() => {
+  onMount(async () => {
+    const cacheVersion = 1;
+    const savedCacheVersion = +(localStorage.getItem("cacheVersion") ?? "0");
+    if (cacheVersion !== savedCacheVersion) {
+      localStorage.setItem("cacheVersion", cacheVersion.toString());
+      await Promise.all(cacheDb.tables.map(it => it.clear()));
+    }
+
+    chapterSort.set(localStorage.getItem("chapterSort") === "-1" ? -1 : 1);
+    chapterSort.subscribe(value => localStorage.setItem("chapterSort", value.toString()));
+
     darkMode.set(localStorage.getItem("darkMode") === "true");
     darkMode.subscribe(value => localStorage.setItem("darkMode", value ? "true" : "false"));
 

@@ -30,6 +30,7 @@ export class CatManga implements Source {
       return make<Manga>({
         id: series.series_id,
         source: this.id,
+        url: `${this.baseUrl}/series/${mangaId}`,
         title: series.title,
         cover: this.imageBaseUrl + series.cover_art.source,
         altTitles: series.alt_titles,

@@ -67,6 +67,7 @@ export class MangaDex implements Source {
           return make<Manga>({
             id: mangaId,
             source: this.id,
+            url: `${this.baseUrl}/title/${mangaId}`,
             title: mangaSpec.data.attributes.title["en"],
             cover: coverSpec ? `${this.uploadsBaseUrl}/covers/${mangaId}/${coverSpec.data.attributes.fileName}` : "",
             altTitles: mangaSpec.data.attributes.altTitles.map(it => Object.values(it)).flat(),

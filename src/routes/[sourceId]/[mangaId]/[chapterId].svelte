@@ -1,9 +1,9 @@
 <script lang="ts">
   import { page } from "$app/stores";
-  import { currentManga, showNavBar } from "tako/stores";
+  import { currentManga, showNavBar } from "tako/api/stores";
   import { onMount } from "svelte";
   import type { Chapter, Page } from "tako/api/model";
-  import { database } from "tako/database";
+  import { database } from "tako/api/database";
   import { goto } from "$app/navigation";
   import { getManga, getPages } from "tako/api/source";
 

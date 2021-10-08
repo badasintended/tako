@@ -86,6 +86,7 @@ export class Madara implements Source {
       return chapters.then(chapters => make<Manga>({
         source: this.id,
         id: mangaId,
+        url: `${this.baseUrl}/manga/${mangaId}`,
         title: $("div.post-title h1").first().text().trim(),
         altTitles: $(".post-content_item:contains(Alt) .summary-content").text().trim().split(", "),
         cover: this.getImage($("div.summary_image img").first()),
