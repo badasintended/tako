@@ -1,1 +1,0 @@
-import{Z as a}from"./vendor-b1776dd9.js";class e extends a{constructor(){super("TakoDatabase");this.version(1).stores({libraries:"id++,sourceId,mangaId",readChapters:"id++,sourceId,mangaId,chapterId",fakeUploadTimes:"id"})}}const r=new e;export{r as d};
